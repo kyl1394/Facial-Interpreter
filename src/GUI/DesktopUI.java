@@ -55,7 +55,12 @@ public class DesktopUI extends Application {
 
         //Add Button Listeners. Lambda Expressions are really cool, too
         chooseImgBtn.setOnAction((ActionEvent event) -> {
-            image.setImage(UIController.selectImage());
+            Image newImg = UIController.selectImage();
+
+            if(newImg == null) // The user didn't want to load a valid picture
+                return;
+
+            image.setImage(newImg);
 
             //Reload Stage with new Image
             stage.hide();
