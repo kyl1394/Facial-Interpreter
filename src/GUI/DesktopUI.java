@@ -1,4 +1,4 @@
-/**
+package GUI; /**
  * Created by Wes on 9/6/2016.
  */
 import javafx.application.Application;
@@ -14,16 +14,12 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class DesktopUI extends Application {
-    private Stage stage;
-
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        stage = primaryStage;
-
+    public void start(Stage stage) {
         stage.setTitle("Facial Interpreter");
 
         //Initialize all elements of the UI
@@ -31,7 +27,7 @@ public class DesktopUI extends Application {
         //Organized to show the xml layout of the UI from the SceneBuilder
         AnchorPane main = new AnchorPane();
             HBox container = new HBox();
-                ImageView image = new ImageView(new Image("/UnselectedPicture.png"));
+                ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
                 VBox btnContainer = new VBox();
                     VBox topBtnPane = new VBox();
                         Button chooseImgBtn = new Button("Choose Image");
@@ -45,18 +41,34 @@ public class DesktopUI extends Application {
         takePicBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setDisable(true); //Not implemented yet
 
-        btnContainer.setVgrow(topBtnPane, Priority.ALWAYS);
-        btnContainer.setVgrow(bottomBtnPane, Priority.ALWAYS);
+        VBox.setVgrow(topBtnPane, Priority.ALWAYS);
+        VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
 
         topBtnPane.setAlignment(Pos.TOP_CENTER);
-        topBtnPane.setMargin(chooseImgBtn, new Insets(10, 0, 10, 0)); // Top, Right, Bottom, Left
+        VBox.setMargin(chooseImgBtn, new Insets(10, 0, 10, 0)); // Top, Right, Bottom, Left
         bottomBtnPane.setAlignment(Pos.BOTTOM_CENTER);
 
-        container.setMargin(image, new Insets(10, 10, 10, 10));
-        container.setMargin(btnContainer, new Insets(10, 10, 10, 10));
-        container.setHgrow(image, Priority.ALWAYS);
-        container.setHgrow(btnContainer, Priority.ALWAYS);
+        HBox.setMargin(image, new Insets(10, 10, 10, 10));
+        HBox.setMargin(btnContainer, new Insets(10, 10, 10, 10));
+        HBox.setHgrow(image, Priority.ALWAYS);
+        HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
+        //Add Button Listeners. Lambda Expressions are really cool, too
+        chooseImgBtn.setOnAction((ActionEvent event) -> {
+            image.setImage(UIController.selectImage());
+
+            //Reload Stage with new Image
+            stage.hide();
+            stage.show();
+        });
+
+        findFacesBtn.setOnAction((ActionEvent event) -> {
+            image.setImage(UIController.parseImage());
+
+            //Reload Stage with new Image
+            stage.hide();
+            stage.show();
+        });
 
         //Combine UI together
         topBtnPane.getChildren().add(chooseImgBtn);
