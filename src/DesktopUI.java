@@ -4,23 +4,26 @@
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class DesktopUI extends Application {
+    private Stage stage;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage primaryStage) {
+        stage = primaryStage;
+
         stage.setTitle("Facial Interpreter");
 
         //Initialize all elements of the UI
@@ -38,6 +41,18 @@ public class DesktopUI extends Application {
 
         //Add Properties to the UI
 
+        chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
+        takePicBtn.setMaxWidth(Double.MAX_VALUE);
+        takePicBtn.setDisable(true); //Not implemented yet
+
+        topBtnPane.setAlignment(Pos.TOP_CENTER);
+        bottomBtnPane.setAlignment(Pos.BOTTOM_CENTER);
+
+
+        container.setMargin(image, new Insets(10, 10, 10, 10));
+        container.setMargin(btnContainer, new Insets(10, 10, 10, 10));
+        container.setHgrow(image, Priority.ALWAYS);
+        container.setHgrow(btnContainer, Priority.ALWAYS);
 
 
         //Combine UI together
@@ -54,11 +69,11 @@ public class DesktopUI extends Application {
 
         main.getChildren().add(container);
 
-        stage.setScene(new Scene(main, 633, 400));
+        stage.setScene(new Scene(main));
 
         stage.show();
 
-
+        //stage.setResizable(false);
 
     }
 }
