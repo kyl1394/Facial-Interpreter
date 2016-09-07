@@ -45,9 +45,12 @@ public class DesktopUI extends Application {
         takePicBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setDisable(true); //Not implemented yet
 
-        topBtnPane.setAlignment(Pos.TOP_CENTER);
-        bottomBtnPane.setAlignment(Pos.BOTTOM_CENTER);
+        btnContainer.setVgrow(topBtnPane, Priority.ALWAYS);
+        btnContainer.setVgrow(bottomBtnPane, Priority.ALWAYS);
 
+        topBtnPane.setAlignment(Pos.TOP_CENTER);
+        topBtnPane.setMargin(chooseImgBtn, new Insets(10, 0, 10, 0)); // Top, Right, Bottom, Left
+        bottomBtnPane.setAlignment(Pos.BOTTOM_CENTER);
 
         container.setMargin(image, new Insets(10, 10, 10, 10));
         container.setMargin(btnContainer, new Insets(10, 10, 10, 10));
