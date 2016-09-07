@@ -88,7 +88,7 @@ public class DesktopUI extends Application {
 
         stage.show();
 
-        //stage.setResizable(false);
+        stage.setResizable(false);
 
     }
 }
