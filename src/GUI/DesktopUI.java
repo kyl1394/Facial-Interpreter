@@ -2,6 +2,7 @@ package GUI; /**
  * Created by Wes on 9/6/2016.
  */
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -11,6 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.transform.Scale;
@@ -35,11 +39,9 @@ public class DesktopUI extends Application {
                 MenuItem openMenuItem = new MenuItem("Open");
                 MenuItem saveMenuItem = new MenuItem("Save");
                 MenuItem closeMenuItem = new MenuItem("Close");
-            Menu runMenu = new Menu("Run");
+            Menu viewMenu = new Menu("View");
                 MenuItem zoomInMenuItem = new MenuItem("Zoom In");
                 MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
-                MenuItem chooseImgMenuItem = new MenuItem("Choose Image");
-                MenuItem findFacesMenuItem = new MenuItem("Find Faces");
 
         BorderPane main = new BorderPane();
             HBox container = new HBox();
@@ -109,35 +111,46 @@ public class DesktopUI extends Application {
 
         //MenuItem Events
         openMenuItem.setOnAction((ActionEvent event) -> {
+            Image newImg = UIController.selectImage();
 
+            if(newImg == null) // The user didn't want to load a valid picture
+                return;
+
+            image.setImage(newImg);
+            stage.sizeToScene();
         });
+        openMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O,  KeyCombination.CONTROL_DOWN));
+
         saveMenuItem.setOnAction((ActionEvent event) -> {
-
+            UIController.saveImage(image.getImage());
         });
+        saveMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S,  KeyCombination.CONTROL_DOWN));
+
         closeMenuItem.setOnAction((ActionEvent event) -> {
-
+            Platform.exit();
         });
+        closeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W,  KeyCombination.CONTROL_DOWN));
+
         zoomInMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(1.25);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
         });
+        zoomInMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.EQUALS,  KeyCombination.CONTROL_DOWN));
+
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(0.8);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
-            if(currentScaling.getScale() < 1)
-                stage.sizeToScene();
+            //if(currentScaling.getScale() < 1)
+            //    stage.sizeToScene();
         });
-        chooseImgMenuItem.setOnAction((ActionEvent event) -> {
+        zoomOutMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS,  KeyCombination.CONTROL_DOWN));
 
-        });
-        findFacesMenuItem.setOnAction((ActionEvent event) -> {
 
-        });
         //Combine UI together
 
         fileMenu.getItems().addAll(openMenuItem, saveMenuItem, closeMenuItem);
-        runMenu.getItems().addAll(zoomInMenuItem, zoomOutMenuItem, chooseImgMenuItem, findFacesMenuItem);
-        menu.getMenus().addAll(fileMenu, runMenu);
+        viewMenu.getItems().addAll(zoomInMenuItem, zoomOutMenuItem);
+        menu.getMenus().addAll(fileMenu, viewMenu);
 
         topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn);
         bottomBtnPane.getChildren().add(findFacesBtn);

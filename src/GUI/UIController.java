@@ -15,6 +15,12 @@ import java.io.File;
  * Created by Wes on 9/7/2016.
  */
 public class UIController {
+
+    private static String fileEXT;
+    private static String fileNAME;
+    private static final FileChooser.ExtensionFilter IMAGE_FILE_EXTENSIONS = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.jpeg");
+
+
     /**
      * Gets an image from the user's file system.
      *
@@ -26,14 +32,14 @@ public class UIController {
      */
     public static Image selectImage()
     {
-        FileChooser.ExtensionFilter IMAGE_FILE_EXTENSIONS = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.jpeg");
         FileChooser search = new FileChooser();
         search.getExtensionFilters().add(IMAGE_FILE_EXTENSIONS);
 
+        File imgFile = null;
         Image selectedImg = null;
 
         try {
-            File imgFile = search.showOpenDialog(null);
+            imgFile = search.showOpenDialog(null);
 
             selectedImg = SwingFXUtils.toFXImage(ImageIO.read(imgFile), null);
         } catch(Exception e) {
@@ -46,7 +52,32 @@ public class UIController {
             a.showAndWait();
         }
 
+        if(selectedImg != null) {
+            String name = imgFile.getName();
+            int periodLoc = name.indexOf('.');
+            fileNAME = name.substring(0, periodLoc);
+            fileEXT = name.substring(periodLoc);
+        }
         return selectedImg;
+    }
+
+    public static void saveImage(Image file) {
+        //TODO
+        FileChooser save = new FileChooser();
+        if(fileEXT == null || fileEXT.equals("") || fileNAME == null || fileNAME.equals("")) {
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+
+            a.setTitle("You dun Goofed!");
+            a.setHeaderText("Cannot Save Nothing");
+            a.setContentText("There is no image here that I can save.\nThe only way for this to happen is if the image was somehow loaded incorrectly or you didn't load an image.");
+
+            a.showAndWait();
+            return; // TODO notify the user of error
+        }
+
+        save.getExtensionFilters().add(IMAGE_FILE_EXTENSIONS);
+        save.setInitialFileName(fileNAME + fileEXT);
+        save.showSaveDialog(null);
     }
 
     /**
