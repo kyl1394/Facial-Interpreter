@@ -64,13 +64,15 @@ public class DesktopUI extends Application {
         imgContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imgContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         image.preserveRatioProperty().set(true);
+        image.fitWidthProperty().bind(imgContainer.widthProperty());
 
         chooseImgBtn.setMinWidth(Region.USE_PREF_SIZE);
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setMinWidth(Region.USE_PREF_SIZE);
         takePicBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setDisable(true); //Taking a picture isn't implemented yet
-
+        findFacesBtn.setMinWidth(Region.USE_PREF_SIZE);
+        findFacesBtn.setMaxWidth(Double.MAX_VALUE);
 
         VBox.setVgrow(topBtnPane, Priority.ALWAYS);
         VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
@@ -105,7 +107,8 @@ public class DesktopUI extends Application {
                 return;
 
             image.setImage(newImg);
-            stage.sizeToScene();
+            if(!stage.isMaximized())
+                stage.sizeToScene();
         });
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
@@ -121,7 +124,8 @@ public class DesktopUI extends Application {
                 return;
 
             image.setImage(newImg);
-            stage.sizeToScene();
+            if(!stage.isMaximized())
+                stage.sizeToScene();
         });
         openMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O,  KeyCombination.CONTROL_DOWN));
 
@@ -174,4 +178,6 @@ public class DesktopUI extends Application {
         stage.setScene(new Scene(main));
         stage.show();
     }
+
+
 }
