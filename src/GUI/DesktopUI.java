@@ -62,7 +62,6 @@ public class DesktopUI extends Application {
         imgContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         image.preserveRatioProperty().set(true);
 
-
         chooseImgBtn.setMinWidth(Region.USE_PREF_SIZE);
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setMinWidth(Region.USE_PREF_SIZE);
@@ -118,20 +117,15 @@ public class DesktopUI extends Application {
         closeMenuItem.setOnAction((ActionEvent event) -> {
 
         });
-        zoomInMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                currentScaling.zoom(1.25);
-
-                image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
-                stage.sizeToScene();
-            }
+        zoomInMenuItem.setOnAction((ActionEvent event) -> {
+            currentScaling.zoom(1.25);
+            image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
         });
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
-            
             currentScaling.zoom(0.8);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
-            stage.sizeToScene();
+            if(currentScaling.getScale() < 1)
+                stage.sizeToScene();
         });
         chooseImgMenuItem.setOnAction((ActionEvent event) -> {
 
