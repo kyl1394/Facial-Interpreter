@@ -64,7 +64,6 @@ public class DesktopUI extends Application {
         imgContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imgContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         image.preserveRatioProperty().set(true);
-        image.fitWidthProperty().bind(imgContainer.widthProperty());
 
         chooseImgBtn.setMinWidth(Region.USE_PREF_SIZE);
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
