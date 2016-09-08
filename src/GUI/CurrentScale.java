@@ -1,7 +1,7 @@
 package GUI;
 
 /**
- * USed by the Scroll Pane to allow zooming of the image.
+ * Used by the Scroll Pane to allow zooming of the image.
  *
  * Created by Wes on 9/7/2016.
  */
@@ -19,5 +19,4 @@ public class CurrentScale {
     public double getScale() {
         return scale;
     }
-
 }

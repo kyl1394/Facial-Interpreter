@@ -16,8 +16,19 @@ import java.io.File;
  */
 public class UIController {
 
+    /**
+     * String to hold the current image's extension
+     */
     private static String fileEXT;
+
+    /**
+     * String to hold the current image's file name
+     */
     private static String fileNAME;
+
+    /**
+     * Object to select all valid image files when opening/saving
+     */
     private static final FileChooser.ExtensionFilter IMAGE_FILE_EXTENSIONS = new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.png", "*.jpeg");
 
 
@@ -41,7 +52,12 @@ public class UIController {
         try {
             imgFile = search.showOpenDialog(null);
 
+            if(imgFile == null)
+                throw new NullPointerException();
+
             selectedImg = SwingFXUtils.toFXImage(ImageIO.read(imgFile), null);
+        } catch (NullPointerException e) {
+            //Do nothing. User just cancelled the operation
         } catch(Exception e) {
             Alert a = new Alert(Alert.AlertType.ERROR);
 
@@ -61,6 +77,11 @@ public class UIController {
         return selectedImg;
     }
 
+    /**
+     * Saves the image using the same name as the uploaded image as default.
+     *
+     * @param file The image to save
+     */
     public static void saveImage(Image file) {
         //TODO
         FileChooser save = new FileChooser();
