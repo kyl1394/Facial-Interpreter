@@ -95,7 +95,6 @@ public class DesktopUI extends Application {
             main.getStylesheets().add(DARK_THEME_CSS);
             darkModeMenuItem.setSelected(true);
         }
-        //darkModeMenuItem.setDisable(true);
 
         /* ************************************
          * Add Event Listeners.
@@ -137,7 +136,9 @@ public class DesktopUI extends Application {
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
             image.setImage(UIController.parseImage(image.getImage()));
-            stage.sizeToScene();
+            if(!stage.isMaximized()) {
+                stage.sizeToScene();
+            }
         });
 
         //MenuItem Events
