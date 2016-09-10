@@ -27,4 +27,19 @@ public class Kairos {
         System.out.println("headers: " + response.getHeaders());
         System.out.println("body:" + response.readEntity(String.class));
     }
+
+    public static void listGallery() {
+        Client client = ClientBuilder.newClient();
+        Entity<String> payload = Entity.text("");
+        Response response = client.target("https://api.kairos.com/gallery/list_all")
+                .request(MediaType.TEXT_PLAIN_TYPE)
+                .header("app_id", "4985f625")
+                .header("app_key", "4423301b832793e217d04bc44eb041d3")
+                .post(payload);
+
+        System.out.println("status: " + response.getStatus());
+        System.out.println("headers: " + response.getHeaders());
+        System.out.println("body:" + response.readEntity(String.class));
+    }
+
 }
