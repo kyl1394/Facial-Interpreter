@@ -58,6 +58,7 @@ public class DesktopUI extends Application {
                     VBox topBtnPane = new VBox();
                         Button chooseImgBtn = new Button("Choose Image");
                         Button takePicBtn   = new Button("Take Picture");
+                        Label infoLabel     = new Label("");
                     VBox bottomBtnPane = new VBox();
                         Button findFacesBtn = new Button("Find Faces");
 
@@ -74,9 +75,9 @@ public class DesktopUI extends Application {
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setMinWidth(Region.USE_PREF_SIZE);
         takePicBtn.setMaxWidth(Double.MAX_VALUE);
-        takePicBtn.setDisable(true); //Taking a picture isn't implemented yet
         findFacesBtn.setMinWidth(Region.USE_PREF_SIZE);
         findFacesBtn.setMaxWidth(Double.MAX_VALUE);
+        infoLabel.setWrapText(true);
 
         VBox.setVgrow(topBtnPane, Priority.ALWAYS);
         VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
@@ -121,12 +122,16 @@ public class DesktopUI extends Application {
         });
 
         takePicBtn.setOnAction((ActionEvent event) -> {
-            //This is gonna be difficult. no idea how im gonna access the windows camera
-            try {
-                Runtime running = Runtime.getRuntime();
-                //running.exec("");
-            } catch (Exception e) {
-                e.printStackTrace();
+            infoLabel.setText("Taking a Picture...");
+            Image takenPic = UIController.takePicture();
+
+            infoLabel.setText("");
+
+            if(takenPic != null) {
+                image.setImage(takenPic);
+            }
+            else {
+                infoLabel.setText("Image Failed to Load");
             }
         });
 
@@ -200,7 +205,7 @@ public class DesktopUI extends Application {
         menu.getMenus().addAll(fileMenu, viewMenu, settingsMenu);
 
         //Combine the Main UI
-        topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn);
+        topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn, infoLabel);
         bottomBtnPane.getChildren().add(findFacesBtn);
         zoomGroup.getChildren().add(image);
         imgContainer.setContent(zoomGroup);
