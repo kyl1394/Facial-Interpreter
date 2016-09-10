@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 
 public class Main {
     public static void main(String args[]) {
-        //DesktopUI.main(args);
+        DesktopUI.main(args);
     }
 
     public static void enroll() {
