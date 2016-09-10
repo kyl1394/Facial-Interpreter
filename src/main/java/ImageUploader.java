@@ -19,7 +19,7 @@ public class ImageUploader {
     }
 
     public String upload(String imagePath) throws IOException {
-        Map text = cloudinary.uploader().upload("C:/Users/krohlfing/Desktop/images/KyleRohlfing.jpg", ObjectUtils.emptyMap());
+        Map text = cloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
         return (String) text.get("url");
     }
 }
