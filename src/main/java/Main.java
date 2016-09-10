@@ -12,8 +12,6 @@ import javax.ws.rs.core.Response;
 
 public class Main {
     public static void main(String args[]) {
-        Kairos.enroll("http://i.imgur.com/ffVXNwd.jpg", "Kyle", "TestingGallery");
-        Kairos.recognize("http://i.imgur.com/sDdcDwd.jpg", "TestingGallery");
         DesktopUI.main(args);
     }
 }
