@@ -8,5 +8,5 @@ public class Main {
         System.out.println("Hello World!");
         //Just testing to see if I can commit
         DesktopUI.main(args);
-    }
+}
 }
