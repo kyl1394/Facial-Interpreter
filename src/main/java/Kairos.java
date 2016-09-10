@@ -33,8 +33,22 @@ public class Kairos {
         Entity<String> payload = Entity.text("");
         Response response = client.target("https://api.kairos.com/gallery/list_all")
                 .request(MediaType.TEXT_PLAIN_TYPE)
-                .header("app_id", "4985f625")
-                .header("app_key", "4423301b832793e217d04bc44eb041d3")
+                .header("app_id", "b9ed4d88")
+                .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
+                .post(payload);
+
+        System.out.println("status: " + response.getStatus());
+        System.out.println("headers: " + response.getHeaders());
+        System.out.println("body:" + response.readEntity(String.class));
+    }
+
+    public static void removeGallery(String galleryName) {
+        Client client = ClientBuilder.newClient();
+        Entity payload = Entity.json("{  \"gallery_name\": \"" + galleryName + "\"}");
+        Response response = client.target("https://api.kairos.com/gallery/remove")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .header("app_id", "b9ed4d88")
+                .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
 
         System.out.println("status: " + response.getStatus());
