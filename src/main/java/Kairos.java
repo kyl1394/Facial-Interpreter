@@ -70,4 +70,18 @@ public class Kairos {
         System.out.println("body:" + response.readEntity(String.class));
     }
 
+    public static void removeFace(String galleryName, String subjectId) {
+        Client client = ClientBuilder.newClient();
+        Entity payload = Entity.json("{  \"gallery_name\": \"" + galleryName + "\",  \"subject_id\": \"" + subjectId + "\"}");
+        Response response = client.target("https://api.kairos.com/gallery/remove_subject")
+                        .request(MediaType.APPLICATION_JSON_TYPE)
+                        .header("app_id", "b9ed4d88")
+                        .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
+                        .post(payload);
+
+        System.out.println("status: " + response.getStatus());
+        System.out.println("headers: " + response.getHeaders());
+        System.out.println("body:" + response.readEntity(String.class));
+    }
+
 }
