@@ -5,20 +5,62 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * Created by krohlfing on 9/10/2016.
+ * Created by krohlfing
  */
 public class Kairos {
-    public static void enroll() {
+    public static void enroll(String imageUrl, String subjectId, String galleryName) {
+        enroll(imageUrl, subjectId, galleryName, "", "");
+    }
+
+    public static void enroll(String imageUrl, String subjectId, String galleryName, String selector) {
+        enroll(imageUrl, subjectId, galleryName, selector, "");
+    }
+
+    public static void enroll(String imageUrl, String subjectId, String galleryName, String selector, String symmetricFill) {
         Client client = ClientBuilder.newClient();
-        Entity<String> payload = Entity.text("{\n" +
-                "    \"image\":\" http://media.kairos.com/kairos-elizabeth.jpg \",\n" +
-                "    \"subject_id\":\"subtest1\",\n" +
-                "    \"gallery_name\":\"gallerytest1\",\n" +
-                "    \"selector\":\"SETPOSE\",\n" +
-                "    \"symmetricFill\":\"true\"\n" +
-                "}");
+        String text = "{\n" +
+                "    \"image\":\"" + imageUrl + "\",\n" +
+                "    \"subject_id\":\"" + subjectId + "\",\n" +
+                "    \"gallery_name\":\"" + galleryName + "\",\n";
+        if (!selector.equals("")) {
+            text += "\"selector\":\"" + selector + "\",\n";
+        } else {
+            text += "\"selector\":\"SETPOSE\",\n";
+        }
+        if (!symmetricFill.equals("")) {
+            text += "\"symmetricFill\":\"" + symmetricFill + "\"\n" +
+                    "}";
+        } else {
+            text += "\"symmetricFill\":\"true\"\n" +
+                    "}";
+        }
+
+        Entity<String> payload = Entity.text(text);
+
         Response response = client.target("https://api.kairos.com/enroll")
                 .request(MediaType.TEXT_PLAIN_TYPE)
+                .header("app_id", "b9ed4d88")
+                .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
+                .post(payload);
+
+        System.out.println("status: " + response.getStatus());
+        System.out.println("headers: " + response.getHeaders());
+        System.out.println("body:" + response.readEntity(String.class));
+    }
+
+    public static void recognize(String imageUrl, String galleryName) {
+        recognize(imageUrl, galleryName, "0.2");
+    }
+
+    public static void recognize(String imageUrl, String galleryName, String threshold) {
+        Client client = ClientBuilder.newClient();
+        Entity<String>  payload = Entity.text("{\n" +
+                "    \"image\":\" " + imageUrl + " \",\n" +
+                "    \"gallery_name\":\"" + galleryName + "\",\n" +
+                "    \"threshold\":\"" + threshold + "\"\n" +
+                "}");
+        Response response = client.target("http://api.kairos.com/recognize")
+                .request(MediaType.APPLICATION_JSON_TYPE)
                 .header("app_id", "b9ed4d88")
                 .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
