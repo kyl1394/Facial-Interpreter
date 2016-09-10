@@ -20,7 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
-
+import API.Kairos;
 
 public class DesktopUI extends Application {
     public static void main(String[] args) {
@@ -73,6 +73,13 @@ public class DesktopUI extends Application {
         takePicBtn.setDisable(true); //Taking a picture isn't implemented yet
         findFacesBtn.setMinWidth(Region.USE_PREF_SIZE);
         findFacesBtn.setMaxWidth(Double.MAX_VALUE);
+        String imageURL = "http://i.imgur.com/MDWx2PQ.jpg";
+        //TODO Not working
+        findFacesBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event) {
+                Kairos.recognize(imageURL, "testGallery", "10");
+            }
+        });
 
         VBox.setVgrow(topBtnPane, Priority.ALWAYS);
         VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
