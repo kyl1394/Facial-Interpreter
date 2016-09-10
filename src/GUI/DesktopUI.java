@@ -120,6 +120,16 @@ public class DesktopUI extends Application {
                 stage.sizeToScene();
         });
 
+        takePicBtn.setOnAction((ActionEvent event) -> {
+            //This is gonna be difficult. no idea how im gonna access the windows camera
+            try {
+                Runtime running = Runtime.getRuntime();
+                //running.exec("");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
         findFacesBtn.setOnAction((ActionEvent event) -> {
             image.setImage(UIController.parseImage(image.getImage()));
             stage.sizeToScene();
