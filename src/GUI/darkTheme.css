@@ -5,7 +5,8 @@
     -fx-dark-text-color: black;
     -fx-mid-text-color: #3a3a3a;
     -fx-light-text-color: #dcdcdc;
-    -fx-accent: red;
+    -fx-accent: #A92F41;
+    -fx-focus-color: #A92F41;
 
 }
 .text-field{

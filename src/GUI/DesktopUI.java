@@ -4,6 +4,7 @@ package GUI;
  */
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -42,6 +43,7 @@ public class DesktopUI extends Application {
                     MenuItem saveMenuItem = new MenuItem("Save");
                     MenuItem closeMenuItem = new MenuItem("Close");
                 Menu viewMenu = new Menu("View");
+                    MenuItem resizeUIMenuItem = new MenuItem("Resize UI");
                     MenuItem zoomInMenuItem = new MenuItem("Zoom In");
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
                 Menu settingsMenu = new Menu("Settings");
@@ -146,6 +148,12 @@ public class DesktopUI extends Application {
         });
         closeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W,  KeyCombination.CONTROL_DOWN));
 
+        resizeUIMenuItem.setOnAction((ActionEvent event) -> {
+            if(!stage.isMaximized()) {
+                stage.sizeToScene();
+            }
+        });
+
         zoomInMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(1.25);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
@@ -163,7 +171,12 @@ public class DesktopUI extends Application {
                 main.getStylesheets().add(DARK_THEME_CSS);
             else
                 main.getStylesheets().remove(DARK_THEME_CSS);
-             
+
+        });
+
+        stage.maximizedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean becomesMaximized) -> {
+            //Triggers when the screen becomes maximized and when it becomes unmaxiximized. Can't resize UI when full screen
+            resizeUIMenuItem.setDisable(becomesMaximized);
         });
 
         /* ************************************
@@ -172,7 +185,7 @@ public class DesktopUI extends Application {
 
         //Combine Menus
         fileMenu.getItems().addAll(openMenuItem, saveMenuItem, closeMenuItem);
-        viewMenu.getItems().addAll(zoomInMenuItem, zoomOutMenuItem);
+        viewMenu.getItems().addAll(resizeUIMenuItem, zoomInMenuItem, zoomOutMenuItem);
         settingsMenu.getItems().add(darkModeMenuItem);
         menu.getMenus().addAll(fileMenu, viewMenu, settingsMenu);
 
