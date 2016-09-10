@@ -44,6 +44,9 @@ public class DesktopUI extends Application {
                 Menu viewMenu = new Menu("View");
                     MenuItem zoomInMenuItem = new MenuItem("Zoom In");
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
+                Menu settingsMenu = new Menu("Settings");
+                    CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
+                    boolean isDarkMode = false;
             HBox container = new HBox();
                 ScrollPane imgContainer = new ScrollPane();
                     Group zoomGroup = new Group();
@@ -85,6 +88,11 @@ public class DesktopUI extends Application {
         HBox.setHgrow(imgContainer, Priority.ALWAYS);
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
+        if(isDarkMode) {
+            main.getStylesheets().add(DARK_THEME_CSS);
+            darkModeMenuItem.setSelected(true);
+        }
+        //darkModeMenuItem.setDisable(true);
 
         /* ************************************
          * Add Event Listeners.
@@ -147,11 +155,16 @@ public class DesktopUI extends Application {
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(0.8);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
-            //if(currentScaling.getScale() < 1)
-            //    stage.sizeToScene();
         });
         zoomOutMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS,  KeyCombination.CONTROL_DOWN));
 
+        darkModeMenuItem.setOnAction((ActionEvent event) -> {
+            if(darkModeMenuItem.isSelected())
+                main.getStylesheets().add(DARK_THEME_CSS);
+            else
+                main.getStylesheets().remove(DARK_THEME_CSS);
+             
+        });
 
         /* ************************************
          * Combine UI Together.
@@ -160,7 +173,8 @@ public class DesktopUI extends Application {
         //Combine Menus
         fileMenu.getItems().addAll(openMenuItem, saveMenuItem, closeMenuItem);
         viewMenu.getItems().addAll(zoomInMenuItem, zoomOutMenuItem);
-        menu.getMenus().addAll(fileMenu, viewMenu);
+        settingsMenu.getItems().add(darkModeMenuItem);
+        menu.getMenus().addAll(fileMenu, viewMenu, settingsMenu);
 
         //Combine the Main UI
         topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn);
@@ -178,5 +192,5 @@ public class DesktopUI extends Application {
         stage.show();
     }
 
-
+    private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
 }
