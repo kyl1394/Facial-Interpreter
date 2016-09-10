@@ -47,7 +47,8 @@ public class DesktopUI extends Application {
             HBox container = new HBox();
                 ScrollPane imgContainer = new ScrollPane();
                     Group zoomGroup = new Group();
-                        ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
+                        System.out.println(System.getProperty("user.dir"));
+                        ImageView image = new ImageView(new Image("file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/UnselectedPicture.png"));
                         CurrentScale currentScaling = new CurrentScale();
                 VBox btnContainer = new VBox();
                     VBox topBtnPane = new VBox();
