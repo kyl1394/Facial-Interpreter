@@ -50,6 +50,7 @@ public class DesktopUI extends Application {
                     CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
                     boolean isDarkMode = false;
             HBox container = new HBox();
+                StackPane infoStack = new StackPane();
                 ScrollPane imgContainer = new ScrollPane();
                     Group zoomGroup = new Group();
                         ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
@@ -61,6 +62,9 @@ public class DesktopUI extends Application {
                         Label infoLabel     = new Label("");
                     VBox bottomBtnPane = new VBox();
                         Button findFacesBtn = new Button("Find Faces");
+
+        Button test = new Button("Testing the Text");
+
 
 
         /* ************************************
@@ -209,6 +213,9 @@ public class DesktopUI extends Application {
         bottomBtnPane.getChildren().add(findFacesBtn);
         zoomGroup.getChildren().add(image);
         imgContainer.setContent(zoomGroup);
+        imgContainer.toBack();
+        infoStack.getChildren().addAll(imgContainer, test);
+
         btnContainer.getChildren().addAll(topBtnPane, bottomBtnPane);
         container.getChildren().addAll(imgContainer, btnContainer);
 
