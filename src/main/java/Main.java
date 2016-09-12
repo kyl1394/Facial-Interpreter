@@ -7,5 +7,5 @@ import GUI.DesktopUI;
 public class Main {
     public static void main(String args[]) {
         DesktopUI.main(args);
-    }
+}
 }

@@ -4,6 +4,7 @@ package GUI;
  */
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -42,8 +43,12 @@ public class DesktopUI extends Application {
                     MenuItem saveMenuItem = new MenuItem("Save");
                     MenuItem closeMenuItem = new MenuItem("Close");
                 Menu viewMenu = new Menu("View");
+                    MenuItem resizeUIMenuItem = new MenuItem("Resize UI");
                     MenuItem zoomInMenuItem = new MenuItem("Zoom In");
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
+                Menu settingsMenu = new Menu("Settings");
+                    CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
+                    boolean isDarkMode = false;
             HBox container = new HBox();
                 ScrollPane imgContainer = new ScrollPane();
                     Group zoomGroup = new Group();
@@ -54,6 +59,7 @@ public class DesktopUI extends Application {
                     VBox topBtnPane = new VBox();
                         Button chooseImgBtn = new Button("Choose Image");
                         Button takePicBtn   = new Button("Take Picture");
+                        Label infoLabel     = new Label("");
                     VBox bottomBtnPane = new VBox();
                         Button findFacesBtn = new Button("Find Faces");
 
@@ -70,9 +76,9 @@ public class DesktopUI extends Application {
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
         takePicBtn.setMinWidth(Region.USE_PREF_SIZE);
         takePicBtn.setMaxWidth(Double.MAX_VALUE);
-        takePicBtn.setDisable(true); //Taking a picture isn't implemented yet
         findFacesBtn.setMinWidth(Region.USE_PREF_SIZE);
         findFacesBtn.setMaxWidth(Double.MAX_VALUE);
+        infoLabel.setWrapText(true);
 
         VBox.setVgrow(topBtnPane, Priority.ALWAYS);
         VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
@@ -86,6 +92,10 @@ public class DesktopUI extends Application {
         HBox.setHgrow(imgContainer, Priority.ALWAYS);
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
+        if(isDarkMode) {
+            main.getStylesheets().add(DARK_THEME_CSS);
+            darkModeMenuItem.setSelected(true);
+        }
 
         /* ************************************
          * Add Event Listeners.
@@ -111,9 +121,25 @@ public class DesktopUI extends Application {
                 stage.sizeToScene();
         });
 
+        takePicBtn.setOnAction((ActionEvent event) -> {
+            infoLabel.setText("Taking a Picture...");
+            Image takenPic = UIController.takePicture();
+
+            infoLabel.setText("");
+
+            if(takenPic != null) {
+                image.setImage(takenPic);
+            }
+            else {
+                infoLabel.setText("Image Failed to Load");
+            }
+        });
+
         findFacesBtn.setOnAction((ActionEvent event) -> {
             image.setImage(UIController.parseImage(image.getImage()));
-            stage.sizeToScene();
+            if(!stage.isMaximized()) {
+                stage.sizeToScene();
+            }
         });
 
         //MenuItem Events
@@ -139,6 +165,12 @@ public class DesktopUI extends Application {
         });
         closeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W,  KeyCombination.CONTROL_DOWN));
 
+        resizeUIMenuItem.setOnAction((ActionEvent event) -> {
+            if(!stage.isMaximized()) {
+                stage.sizeToScene();
+            }
+        });
+
         zoomInMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(1.25);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
@@ -148,11 +180,21 @@ public class DesktopUI extends Application {
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(0.8);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
-            //if(currentScaling.getScale() < 1)
-            //    stage.sizeToScene();
         });
         zoomOutMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS,  KeyCombination.CONTROL_DOWN));
 
+        darkModeMenuItem.setOnAction((ActionEvent event) -> {
+            if(darkModeMenuItem.isSelected())
+                main.getStylesheets().add(DARK_THEME_CSS);
+            else
+                main.getStylesheets().remove(DARK_THEME_CSS);
+
+        });
+
+        stage.maximizedProperty().addListener((ObservableValue<? extends Boolean> ov, Boolean t, Boolean becomesMaximized) -> {
+            //Triggers when the screen becomes maximized and when it becomes unmaxiximized. Can't resize UI when full screen
+            resizeUIMenuItem.setDisable(becomesMaximized);
+        });
 
         /* ************************************
          * Combine UI Together.
@@ -160,11 +202,12 @@ public class DesktopUI extends Application {
 
         //Combine Menus
         fileMenu.getItems().addAll(openMenuItem, saveMenuItem, closeMenuItem);
-        viewMenu.getItems().addAll(zoomInMenuItem, zoomOutMenuItem);
-        menu.getMenus().addAll(fileMenu, viewMenu);
+        viewMenu.getItems().addAll(resizeUIMenuItem, zoomInMenuItem, zoomOutMenuItem);
+        settingsMenu.getItems().add(darkModeMenuItem);
+        menu.getMenus().addAll(fileMenu, viewMenu, settingsMenu);
 
         //Combine the Main UI
-        topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn);
+        topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn, infoLabel);
         bottomBtnPane.getChildren().add(findFacesBtn);
         zoomGroup.getChildren().add(image);
         imgContainer.setContent(zoomGroup);
@@ -179,5 +222,5 @@ public class DesktopUI extends Application {
         stage.show();
     }
 
-
+    private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
 }
