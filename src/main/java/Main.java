@@ -5,18 +5,20 @@
 import GUI.DesktopUI;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.*;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
-
 import java.io.FileNotFoundException;
 
 public class Main {
     public static void main(String args[]) throws FileNotFoundException{
         initFirebaseSDK();
+
         DesktopUI.main(args);
     }
 
@@ -61,5 +63,20 @@ public class Main {
                 .build();
 
         FirebaseApp.initializeApp(options);
+
+        //dump database contents to terminal
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Object res = dataSnapshot.getValue();  // returns contents of database as hash map
+                System.out.println(res.toString()); //prints database in JSON format to console.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }
