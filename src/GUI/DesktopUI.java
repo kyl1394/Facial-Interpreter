@@ -9,7 +9,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -48,7 +50,7 @@ public class DesktopUI extends Application {
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
                 Menu settingsMenu = new Menu("Settings");
                     CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
-                    boolean isDarkMode = false;
+                    boolean isDarkMode = true;
             HBox container = new HBox();
                 StackPane infoStack = new StackPane();
                     ScrollPane imgContainer = new ScrollPane();
@@ -65,9 +67,9 @@ public class DesktopUI extends Application {
                         Button findFacesBtn = new Button("Find Faces");
 
         infoStack.setAlignment(Pos.TOP_LEFT);
-        Button test = new Button("Testing the Text");
-        test.setId("face1");
-        //test.
+        Button test = createNewFaceButton(50, 50, 100, 100, "");
+
+
 
 
         /* ************************************
@@ -93,9 +95,9 @@ public class DesktopUI extends Application {
         VBox.setMargin(chooseImgBtn, new Insets(10, 0, 10, 0)); // Top, Right, Bottom, Left
         bottomBtnPane.setAlignment(Pos.BOTTOM_CENTER);
 
-        HBox.setMargin(imgContainer, new Insets(10, 10, 10, 10));
+        HBox.setMargin(infoStack, new Insets(10, 10, 10, 10));
         HBox.setMargin(btnContainer, new Insets(10, 10, 10, 10));
-        HBox.setHgrow(imgContainer, Priority.ALWAYS);
+        HBox.setHgrow(infoStack, Priority.ALWAYS);
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
         if(isDarkMode) {
@@ -179,12 +181,18 @@ public class DesktopUI extends Application {
         zoomInMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(1.25);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            /*for(Node n: faceBtnContainer.getChildren()) {
+                n.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            }*/
         });
         zoomInMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.EQUALS,  KeyCombination.CONTROL_DOWN));
 
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
             currentScaling.zoom(0.8);
             image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            /*for(Node n: faceBtnContainer.getChildren()) {
+                n.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            }*/
         });
         zoomOutMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.MINUS,  KeyCombination.CONTROL_DOWN));
 
@@ -216,10 +224,9 @@ public class DesktopUI extends Application {
         bottomBtnPane.getChildren().add(findFacesBtn);
         zoomGroup.getChildren().add(image);
         imgContainer.setContent(zoomGroup);
-        //imgContainer.toBack();
 
         faceBtnContainer.getChildren().add(test);
-        infoStack.getChildren().addAll(imgContainer, faceBtnContainer);
+        infoStack.getChildren().addAll(imgContainer, test);
 
 
         btnContainer.getChildren().addAll(topBtnPane, bottomBtnPane);
@@ -231,6 +238,31 @@ public class DesktopUI extends Application {
         //Show the UI
         stage.setScene(new Scene(main));
         stage.show();
+    }
+
+    private static Button createNewFaceButton(int xPos, int yPos, int width, int height, String text) {
+        Button test = new Button();
+        test.setId("face");
+        test.setStyle("-fx-background-color: rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0);\n" +
+                "    -fx-border-color: -fx-focus-color;");
+        test.setLayoutX(xPos);
+        test.setLayoutY(yPos);
+        test.setMinHeight(height);
+        test.setMaxHeight(height);
+        test.setMinWidth(width);
+        test.setMaxWidth(width);
+        test.setCursor(Cursor.HAND);
+
+        test.setOnAction((ActionEvent event) -> {
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+
+            a.setTitle("Face Information");
+            a.setHeaderText(text);
+
+            a.showAndWait();
+        });
+
+        return test;
     }
 
     private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
