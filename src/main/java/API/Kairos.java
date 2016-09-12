@@ -45,6 +45,13 @@ public class Kairos {
                 .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
 
+        String body = response.readEntity(String.class);
+
+        int lastIndexOf = 0;
+        while ((lastIndexOf = body.indexOf("transaction", lastIndexOf)) != -1) {
+            System.out.println(body.substring(lastIndexOf, body.indexOf("}", lastIndexOf)));
+        }
+
         System.out.println("status: " + response.getStatus());
         System.out.println("headers: " + response.getHeaders());
         System.out.println("body:" + response.readEntity(String.class));
