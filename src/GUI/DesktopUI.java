@@ -51,10 +51,11 @@ public class DesktopUI extends Application {
                     boolean isDarkMode = false;
             HBox container = new HBox();
                 StackPane infoStack = new StackPane();
-                ScrollPane imgContainer = new ScrollPane();
-                    Group zoomGroup = new Group();
-                        ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
-                        CurrentScale currentScaling = new CurrentScale();
+                    ScrollPane imgContainer = new ScrollPane();
+                        Group zoomGroup = new Group();
+                            ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
+                            CurrentScale currentScaling = new CurrentScale();
+                    AnchorPane faceBtnContainer = new AnchorPane();
                 VBox btnContainer = new VBox();
                     VBox topBtnPane = new VBox();
                         Button chooseImgBtn = new Button("Choose Image");
@@ -63,8 +64,10 @@ public class DesktopUI extends Application {
                     VBox bottomBtnPane = new VBox();
                         Button findFacesBtn = new Button("Find Faces");
 
+        infoStack.setAlignment(Pos.TOP_LEFT);
         Button test = new Button("Testing the Text");
-
+        test.setId("face1");
+        //test.
 
 
         /* ************************************
@@ -213,11 +216,14 @@ public class DesktopUI extends Application {
         bottomBtnPane.getChildren().add(findFacesBtn);
         zoomGroup.getChildren().add(image);
         imgContainer.setContent(zoomGroup);
-        imgContainer.toBack();
-        infoStack.getChildren().addAll(imgContainer, test);
+        //imgContainer.toBack();
+
+        faceBtnContainer.getChildren().add(test);
+        infoStack.getChildren().addAll(imgContainer, faceBtnContainer);
+
 
         btnContainer.getChildren().addAll(topBtnPane, bottomBtnPane);
-        container.getChildren().addAll(imgContainer, btnContainer);
+        container.getChildren().addAll(infoStack, btnContainer);
 
         main.setTop(menu);
         main.setCenter(container);
