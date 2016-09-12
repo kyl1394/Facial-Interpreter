@@ -41,8 +41,9 @@ public class UIController {
      *
      * @return The image file given by the user.
      */
-    public static Image selectImage()
+    public static ImageWithPath selectImage()
     {
+        ImageWithPath image = new ImageWithPath();
         FileChooser search = new FileChooser();
         search.getExtensionFilters().add(IMAGE_FILE_EXTENSIONS);
 
@@ -73,8 +74,11 @@ public class UIController {
             int periodLoc = name.indexOf('.');
             fileNAME = name.substring(0, periodLoc);
             fileEXT = name.substring(periodLoc);
+            image.image = selectedImg;
+            image.path = imgFile.getAbsolutePath();
         }
-        return selectedImg;
+
+        return image;
     }
 
     /**

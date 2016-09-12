@@ -2,6 +2,7 @@ package GUI;
 /**
  * Created by Wes on 9/6/2016.
  */
+import API.ImageUploader;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -22,10 +23,14 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import API.Kairos;
 
+import java.io.IOException;
+
 public class DesktopUI extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+    String pathToChosenImage = "";
 
     @Override
     public void start(Stage stage) {
@@ -73,13 +78,6 @@ public class DesktopUI extends Application {
         takePicBtn.setDisable(true); //Taking a picture isn't implemented yet
         findFacesBtn.setMinWidth(Region.USE_PREF_SIZE);
         findFacesBtn.setMaxWidth(Double.MAX_VALUE);
-        String imageURL = "http://i.imgur.com/MDWx2PQ.jpg";
-        //TODO Not working
-        findFacesBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event) {
-                Kairos.recognize(imageURL, "testGallery", "10");
-            }
-        });
 
         VBox.setVgrow(topBtnPane, Priority.ALWAYS);
         VBox.setVgrow(bottomBtnPane, Priority.ALWAYS);
@@ -108,29 +106,40 @@ public class DesktopUI extends Application {
         });
 
         chooseImgBtn.setOnAction((ActionEvent event) -> {
-            Image newImg = UIController.selectImage();
+            ImageWithPath newImg = UIController.selectImage();
 
-            if(newImg == null) // The user didn't load a valid picture
+            if(newImg.image == null) // The user didn't load a valid picture
                 return;
 
-            image.setImage(newImg);
+            pathToChosenImage = newImg.path;
+
+            image.setImage(newImg.image);
             if(!stage.isMaximized())
                 stage.sizeToScene();
         });
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
             image.setImage(UIController.parseImage(image.getImage()));
+            System.out.println(pathToChosenImage);
+            ImageUploader uploader = new ImageUploader();
+            String url = "";
+            try {
+                url = uploader.upload(pathToChosenImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Kairos.recognize(url, "testGallery", "0.1");
             stage.sizeToScene();
         });
 
         //MenuItem Events
         openMenuItem.setOnAction((ActionEvent event) -> {
-            Image newImg = UIController.selectImage();
+            ImageWithPath newImg = UIController.selectImage();
 
             if(newImg == null) // The user didn't want to load a valid picture
                 return;
 
-            image.setImage(newImg);
+            image.setImage(newImg.image);
             if(!stage.isMaximized())
                 stage.sizeToScene();
         });
