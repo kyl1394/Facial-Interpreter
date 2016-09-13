@@ -86,11 +86,45 @@ public class Main {
         DatabaseReference ref = database.getReference("server/test");
         DatabaseReference studentRef = ref.child("student");
 
-        Student tmp = new Student("Sunny","","09/21/2016","https://url.somewhere.io");
+        Student tmp = new Student("Sunny","","09/21/2016");
 
-        studentRef.push().setValue(tmp);  // this will add a student to the db if passed the object.
+        //studentRef.push().setValue(tmp);  // this will add a student to the db if passed the object.
 
         System.out.println("data set to DB");
+        System.out.println(FindStudentInfo("Kelly"));
+        System.out.println("ran find student info");
 
+    }
+
+    // This functino will look through the database for the student name
+    private static Student FindStudentInfo(String Name){
+        final Student[] foundStudent = {null};
+        final String[] prmaryKey = {null};
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("server/test/student");
+
+        ref.orderByChild("Name").equalTo(Name).addChildEventListener(new ChildEventListener(){
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey){
+                prmaryKey[0] = dataSnapshot.getKey();
+                System.out.println( dataSnapshot.getValue());
+                Object tmp = dataSnapshot.getValue();
+                System.out.println(((HashMap<String,String>)tmp).get("Name"));
+                //foundStudent[0] = new Student(((HashMap<String,String>)tmp).get("Name"),)
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+
+        return foundStudent[0];
     }
 }

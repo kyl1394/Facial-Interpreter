@@ -5,13 +5,11 @@ public class Student {
     public String Name;
     public String Notes;
     public String LastSeen;
-    public String URL;
 
-    public Student(String Name, String Notes, String LastSeen, String URL){
+    public Student(String Name, String Notes, String LastSeen){
         this.Name = Name;
         this.Notes = Notes;
         this.LastSeen = LastSeen;
-        this.URL = URL;
     }
 
 }
