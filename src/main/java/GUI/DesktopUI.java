@@ -22,6 +22,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.transform.Scale;
+import javafx.stage.Popup;
+import javafx.stage.PopupBuilder;
 import javafx.stage.Stage;
 
 
@@ -50,22 +52,14 @@ public class DesktopUI extends Application {
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
                 Menu settingsMenu = new Menu("Settings");
                     CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
-                    boolean isDarkMode = true;
+                    boolean isDarkMode = false;
             HBox container = new HBox();
-<<<<<<< HEAD:src/main/java/GUI/DesktopUI.java
-                ScrollPane imgContainer = new ScrollPane();
-                    Group zoomGroup = new Group();
-                        System.out.println(System.getProperty("user.dir"));
-                        ImageView image = new ImageView(new Image("file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/UnselectedPicture.png"));
-                        CurrentScale currentScaling = new CurrentScale();
-=======
                 StackPane infoStack = new StackPane();
-                    ScrollPane imgContainer = new ScrollPane();
-                        Group zoomGroup = new Group();
-                            ImageView image = new ImageView(new Image("/GUI/UnselectedPicture.png"));
-                            CurrentScale currentScaling = new CurrentScale();
+                    //ScrollPane imgContainer = new ScrollPane();
+                        //Group zoomGroup = new Group();
+                            ImageView image = new ImageView(new Image("file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/UnselectedPicture.png"));
+                        //    CurrentScale currentScaling = new CurrentScale();
                     AnchorPane faceBtnContainer = new AnchorPane();
->>>>>>> refs/remotes/origin/FloatingButtonsOnImage:src/GUI/DesktopUI.java
                 VBox btnContainer = new VBox();
                     VBox topBtnPane = new VBox();
                         Button chooseImgBtn = new Button("Choose Image");
@@ -84,9 +78,17 @@ public class DesktopUI extends Application {
          * Add Properties to the UI
          * ************************************/
 
-        imgContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        imgContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        darkModeMenuItem.setDisable(true);
+        zoomInMenuItem.setDisable(true);
+        zoomOutMenuItem.setDisable(true);
+        saveMenuItem.setDisable(true);
+
+        //imgContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        //imgContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         image.preserveRatioProperty().set(true);
+        image.fitWidthProperty().bind(infoStack.widthProperty());
+        image.fitHeightProperty().bind(infoStack.heightProperty());
+
 
         chooseImgBtn.setMinWidth(Region.USE_PREF_SIZE);
         chooseImgBtn.setMaxWidth(Double.MAX_VALUE);
@@ -109,8 +111,8 @@ public class DesktopUI extends Application {
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
         if(isDarkMode) {
-            main.getStylesheets().add(DARK_THEME_CSS);
-            darkModeMenuItem.setSelected(true);
+            //main.getStylesheets().add(DARK_THEME_CSS);
+            //darkModeMenuItem.setSelected(true);
         }
 
         /* ************************************
@@ -118,12 +120,9 @@ public class DesktopUI extends Application {
          * ************************************/
 
         //Allow scrolling the image without having to click the image
-        image.addEventHandler(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                image.requestFocus();
-                event.consume();
-            }
+        image.addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent event) -> {
+            image.requestFocus();
+            event.consume();
         });
 
         chooseImgBtn.setOnAction((ActionEvent event) -> {
@@ -153,9 +152,9 @@ public class DesktopUI extends Application {
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
             image.setImage(UIController.parseImage(image.getImage()));
-            if(!stage.isMaximized()) {
+            //if(!stage.isMaximized())
                 stage.sizeToScene();
-            }
+
         });
 
         //MenuItem Events
@@ -166,7 +165,7 @@ public class DesktopUI extends Application {
                 return;
 
             image.setImage(newImg);
-            if(!stage.isMaximized())
+            //if(!stage.isMaximized())
                 stage.sizeToScene();
         });
         openMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O,  KeyCombination.CONTROL_DOWN));
@@ -182,14 +181,13 @@ public class DesktopUI extends Application {
         closeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W,  KeyCombination.CONTROL_DOWN));
 
         resizeUIMenuItem.setOnAction((ActionEvent event) -> {
-            if(!stage.isMaximized()) {
+            //if(!stage.isMaximized())
                 stage.sizeToScene();
-            }
         });
 
         zoomInMenuItem.setOnAction((ActionEvent event) -> {
-            currentScaling.zoom(1.25);
-            image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            //currentScaling.zoom(1.25);
+            //image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
             /*for(Node n: faceBtnContainer.getChildren()) {
                 n.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
             }*/
@@ -197,8 +195,8 @@ public class DesktopUI extends Application {
         zoomInMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.EQUALS,  KeyCombination.CONTROL_DOWN));
 
         zoomOutMenuItem.setOnAction((ActionEvent event) -> {
-            currentScaling.zoom(0.8);
-            image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
+            //currentScaling.zoom(0.8);
+            //image.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
             /*for(Node n: faceBtnContainer.getChildren()) {
                 n.getTransforms().setAll(new Scale(currentScaling.getScale(), currentScaling.getScale()));
             }*/
@@ -231,11 +229,11 @@ public class DesktopUI extends Application {
         //Combine the Main UI
         topBtnPane.getChildren().addAll(chooseImgBtn, takePicBtn, infoLabel);
         bottomBtnPane.getChildren().add(findFacesBtn);
-        zoomGroup.getChildren().add(image);
-        imgContainer.setContent(zoomGroup);
+        //zoomGroup.getChildren().add(image);
+        //imgContainer.setContent(zoomGroup);
 
         faceBtnContainer.getChildren().add(test);
-        infoStack.getChildren().addAll(imgContainer, test);
+        infoStack.getChildren().addAll(image, faceBtnContainer);
 
 
         btnContainer.getChildren().addAll(topBtnPane, bottomBtnPane);
@@ -246,6 +244,7 @@ public class DesktopUI extends Application {
 
         //Show the UI
         stage.setScene(new Scene(main));
+        //stage.setResizable(false);
         stage.show();
     }
 
@@ -262,6 +261,17 @@ public class DesktopUI extends Application {
         test.setMaxWidth(width);
         test.setCursor(Cursor.HAND);
 
+        ContextMenu rightClickMenu = new ContextMenu();
+        MenuItem editInfo = new MenuItem("Edit Face's Information");
+
+        editInfo.setOnAction((ActionEvent event) -> {
+            addInfoScene(text);
+        });
+
+        rightClickMenu.getItems().add(editInfo);
+
+        test.setContextMenu(rightClickMenu);
+
         test.setOnAction((ActionEvent event) -> {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
 
@@ -274,5 +284,37 @@ public class DesktopUI extends Application {
         return test;
     }
 
-    private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
+    private final static String DARK_THEME_CSS = "file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/darkTheme.css";
+
+
+    private static void addInfoScene(String currentText) {
+        Stage tempStage = new Stage();
+
+        AnchorPane root = new AnchorPane();
+            VBox container = new VBox();
+                TextArea input = new TextArea(currentText);
+                HBox btnContainer = new HBox();
+                    Button confirmBtn = new Button("Confirm");
+                    Button cancelBtn = new Button("Cancel");
+
+
+        confirmBtn.setOnAction((ActionEvent event) -> {
+            UIController.changeInfo(input.getText());
+            tempStage.hide();
+        });
+
+        cancelBtn.setOnAction((ActionEvent event) -> {
+            tempStage.hide();
+        });
+
+
+        btnContainer.getChildren().addAll(confirmBtn, cancelBtn);
+        container.getChildren().addAll(input, btnContainer);
+        root.getChildren().add(container);
+
+        tempStage.setScene(new Scene(root));
+
+        tempStage.show();
+
+    }
 }

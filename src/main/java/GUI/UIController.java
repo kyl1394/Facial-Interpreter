@@ -167,4 +167,7 @@ public class UIController {
     private static Image openImage(File imgToOpen) throws Exception{
         return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
     }
+
+    public static void changeInfo(String text) {
+    }
 }
