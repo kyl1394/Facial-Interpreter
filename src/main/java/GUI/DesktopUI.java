@@ -151,7 +151,13 @@ public class DesktopUI extends Application {
         });
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
-            image.setImage(UIController.parseImage(image.getImage()));
+            /* //Temp Code for what this method SHOULD do on complete implementation
+            for( InfoObj newBtn: parseImage() ) {
+                Button face = createNewFaceBtn(newBtn.xPos, newBtn.yPos, newBtn.width, newBtn.height, newBtn.faceInfo);
+                faceBtnContainer.add(face);
+            }
+
+            */
             //if(!stage.isMaximized())
                 stage.sizeToScene();
 
