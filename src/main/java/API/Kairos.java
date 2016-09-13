@@ -1,10 +1,18 @@
 package API;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * Created by krohlfing
@@ -45,13 +53,6 @@ public class Kairos {
                 .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
 
-        String body = response.readEntity(String.class);
-
-        int lastIndexOf = 0;
-        while ((lastIndexOf = body.indexOf("transaction", lastIndexOf)) != -1) {
-            System.out.println(body.substring(lastIndexOf, body.indexOf("}", lastIndexOf)));
-        }
-
         System.out.println("status: " + response.getStatus());
         System.out.println("headers: " + response.getHeaders());
         System.out.println("body:" + response.readEntity(String.class));
@@ -74,9 +75,18 @@ public class Kairos {
                 .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
 
-        System.out.println("status: " + response.getStatus());
-        System.out.println("headers: " + response.getHeaders());
-        System.out.println("body:" + response.readEntity(String.class));
+        String body = response.readEntity(String.class);
+
+        JsonElement root = new JsonParser().parse(body);
+        JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
+            System.out.println("Found: " + transaction.get("subject") + " at X: " + transaction.get("topLeftX") +  ", Y: " + transaction.get("topLeftY")  +  ", Width: " + transaction.get("width")  +  ", height: " + transaction.get("height") + "; ");
+        }
+//        System.out.println("status: " + response.getStatus());
+//        System.out.println("headers: " + response.getHeaders());
+//        System.out.println("body:" + body);
     }
 
     public static void listGallery() {
