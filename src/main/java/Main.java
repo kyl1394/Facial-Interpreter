@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     public static void main(String args[]) throws FileNotFoundException{
@@ -64,7 +66,8 @@ public class Main {
 
         FirebaseApp.initializeApp(options);
 
-        //dump database contents to terminal
+        //dump database contents to terminal (used for debugging)
+        /*
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -78,5 +81,16 @@ public class Main {
 
             }
         });
+        */
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("server/test");
+        DatabaseReference studentRef = ref.child("student");
+
+        Student tmp = new Student("Sunny","","09/21/2016","https://url.somewhere.io");
+
+        studentRef.push().setValue(tmp);  // this will add a student to the db if passed the object.
+
+        System.out.println("data set to DB");
+
     }
 }
