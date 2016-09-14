@@ -1,5 +1,6 @@
 package API;
 
+import GUI.DesktopUI;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -62,7 +63,7 @@ public class Kairos {
         recognize(imageUrl, galleryName, "0.2");
     }
 
-    public static void recognize(String imageUrl, String galleryName, String threshold) {
+    public static String recognize(String imageUrl, String galleryName, String threshold) {
         Client client = ClientBuilder.newClient();
         Entity<String>  payload = Entity.text("{\n" +
                 "    \"image\":\" " + imageUrl + " \",\n" +
@@ -77,13 +78,7 @@ public class Kairos {
 
         String body = response.readEntity(String.class);
 
-        JsonElement root = new JsonParser().parse(body);
-        JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
-
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
-            System.out.println("Found: " + transaction.get("subject") + " at X: " + transaction.get("topLeftX") +  ", Y: " + transaction.get("topLeftY")  +  ", Width: " + transaction.get("width")  +  ", height: " + transaction.get("height") + "; ");
-        }
+        return body;
 //        System.out.println("status: " + response.getStatus());
 //        System.out.println("headers: " + response.getHeaders());
 //        System.out.println("body:" + body);

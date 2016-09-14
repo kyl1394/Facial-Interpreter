@@ -3,6 +3,10 @@ package GUI;
  * Created by Wes on 9/6/2016.
  */
 import API.ImageUploader;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -137,6 +141,7 @@ public class DesktopUI extends Application {
                 return;
 
             pathToChosenImage = newImg.path;
+            faceBtnContainer.getChildren().clear();
 
             image.setImage(newImg.image);
             if(!stage.isMaximized())
@@ -167,7 +172,16 @@ public class DesktopUI extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Kairos.recognize(url, "testGallery", "0.1");
+            String response = Kairos.recognize(url, "testGallery", "0.1");
+
+            JsonElement root = new JsonParser().parse(response);
+            JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
+                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), transaction.get("subject").toString()));
+            }
+
             //if(!stage.isMaximized())
                 stage.sizeToScene();
 
@@ -264,7 +278,7 @@ public class DesktopUI extends Application {
         stage.show();
     }
 
-    private static Button createNewFaceButton(int xPos, int yPos, int width, int height, String text) {
+    public static Button createNewFaceButton(int xPos, int yPos, int width, int height, String text) {
         Button test = new Button();
         test.setId("face");
         test.setStyle("-fx-background-color: rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0);\n" +
