@@ -4,9 +4,13 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
-
 import javax.imageio.ImageIO;
 import java.io.File;
+
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
+import org.opencv.highgui.VideoCapture;
 
 /**
  * This static class is used for the logic of the UI.
@@ -25,6 +29,8 @@ public class UIController {
      * String to hold the current image's file name
      */
     private static String fileNAME;
+
+    //private static final String TAKEN_PIC_SAVE_LOCATION = "";
 
     /**
      * Object to select all valid image files when opening/saving
@@ -56,7 +62,7 @@ public class UIController {
             if(imgFile == null)
                 throw new NullPointerException();
 
-            selectedImg = SwingFXUtils.toFXImage(ImageIO.read(imgFile), null);
+            selectedImg = openImage(imgFile);
         } catch (NullPointerException e) {
             //Do nothing. User just cancelled the operation
         } catch(Exception e) {
@@ -87,7 +93,6 @@ public class UIController {
      * @param file The image to save
      */
     public static void saveImage(Image file) {
-        //TODO
         FileChooser save = new FileChooser();
         if(fileEXT == null || fileEXT.equals("") || fileNAME == null || fileNAME.equals("")) {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
@@ -117,5 +122,56 @@ public class UIController {
 
         //TODO implement facial recognition code
         return imgToParse;
+    }
+
+    /**
+     * Takes a picture using the given camera, if available.
+     *
+     * @return The picture taken by the camera
+     */
+    public static Image takePicture() {
+        //Take the picture and save it
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        VideoCapture camera = new VideoCapture(0);
+
+        if (!camera.isOpened()) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+
+            a.setTitle("Error in Taking a Picture");
+            a.setHeaderText("Cannot Open the Camera");
+            a.setContentText("This application cannot open your camera. Either you don't have one, or it doesn't have permission to open it.");
+
+            a.showAndWait();
+        } else {
+            Mat frame = new Mat();
+            while (true) {
+                if (camera.read(frame)) {
+                    System.out.println("Frame Obtained");
+                    System.out.println("Captured Frame Width " +
+                            frame.width() + " Height " + frame.height());
+                    Highgui.imwrite("camera.jpg", frame);
+                    System.out.println("OK");
+                    break;
+                }
+            }
+        }
+        camera.release();
+
+        //Load the Picture
+        Image capturedImg = null;
+        try {
+            File temp = new File("camera.jpg");
+            capturedImg = openImage(temp);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return capturedImg;
+    }
+
+    private static Image openImage(File imgToOpen) throws Exception{
+        return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
+    }
+
+    public static void changeInfo(String text) {
     }
 }
