@@ -2,21 +2,15 @@ package GUI;
 /**
  * Created by Wes on 9/6/2016.
  */
-import API.ImageUploader;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -26,13 +20,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.transform.Scale;
-import javafx.stage.Popup;
-import javafx.stage.PopupBuilder;
 import javafx.stage.Stage;
-import API.Kairos;
-
-import java.io.IOException;
 
 public class DesktopUI extends Application {
     public static void main(String[] args) {
@@ -44,6 +32,7 @@ public class DesktopUI extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Facial Interpreter");
+        System.out.println(getClass().getName());
 
         /* ************************************
          * Initialize all elements of the UI
@@ -61,7 +50,7 @@ public class DesktopUI extends Application {
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
                 Menu settingsMenu = new Menu("Settings");
                     CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
-                    boolean isDarkMode = false;
+                    boolean isDarkMode = true;
             HBox container = new HBox();
                 StackPane infoStack = new StackPane();
                     //ScrollPane imgContainer = new ScrollPane();
@@ -78,7 +67,7 @@ public class DesktopUI extends Application {
                         Button findFacesBtn = new Button("Find Faces");
 
         infoStack.setAlignment(Pos.TOP_LEFT);
-        Button test = createNewFaceButton(50, 50, 100, 100, "");
+        Button test = createNewFaceButton(50, 50, 100, 100, new StringBuilder(""));
 
 
 
@@ -87,7 +76,6 @@ public class DesktopUI extends Application {
          * Add Properties to the UI
          * ************************************/
 
-        darkModeMenuItem.setDisable(true);
         zoomInMenuItem.setDisable(true);
         zoomOutMenuItem.setDisable(true);
         saveMenuItem.setDisable(true);
@@ -120,8 +108,8 @@ public class DesktopUI extends Application {
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
         if(isDarkMode) {
-            //main.getStylesheets().add(DARK_THEME_CSS);
-            //darkModeMenuItem.setSelected(true);
+            main.getStylesheets().add(DARK_THEME_CSS);
+            darkModeMenuItem.setSelected(true);
         }
 
         /* ************************************
@@ -163,23 +151,15 @@ public class DesktopUI extends Application {
         });
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
-            image.setImage(UIController.parseImage(image.getImage()));
-            System.out.println(pathToChosenImage);
-            ImageUploader uploader = new ImageUploader();
-            String url = "";
-            try {
-                url = uploader.upload(pathToChosenImage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String response = Kairos.recognize(url, "testGallery", "0.1");
+            infoLabel.setText("Looking for Faces");
 
-            JsonElement root = new JsonParser().parse(response);
-            JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
+            JsonArray jsonArray = UIController.parseImage();
 
+            infoLabel.setText("No Faces Found");
             for (int i = 0; i < jsonArray.size(); i++) {
+                infoLabel.setText("");
                 JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
-                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), transaction.get("subject").toString()));
+                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), new StringBuilder(transaction.get("subject").toString())));
             }
 
             //if(!stage.isMaximized())
@@ -278,7 +258,7 @@ public class DesktopUI extends Application {
         stage.show();
     }
 
-    public static Button createNewFaceButton(int xPos, int yPos, int width, int height, String text) {
+    public static Button createNewFaceButton(int xPos, int yPos, int width, int height, StringBuilder text) {
         Button test = new Button();
         test.setId("face");
         test.setStyle("-fx-background-color: rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0);\n" +
@@ -306,7 +286,7 @@ public class DesktopUI extends Application {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
 
             a.setTitle("Face Information");
-            a.setHeaderText(text);
+            a.setHeaderText(text.toString());
 
             a.showAndWait();
         });
@@ -314,22 +294,21 @@ public class DesktopUI extends Application {
         return test;
     }
 
-    private final static String DARK_THEME_CSS = "file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/darkTheme.css";
-
-
-    private static void addInfoScene(String currentText) {
+    private static void addInfoScene(StringBuilder currentText) {
         Stage tempStage = new Stage();
 
         AnchorPane root = new AnchorPane();
             VBox container = new VBox();
-                TextArea input = new TextArea(currentText);
+                TextArea input = new TextArea(currentText.toString());
                 HBox btnContainer = new HBox();
                     Button confirmBtn = new Button("Confirm");
                     Button cancelBtn = new Button("Cancel");
 
 
         confirmBtn.setOnAction((ActionEvent event) -> {
-            UIController.changeInfo(input.getText());
+            currentText.setLength(0);
+            currentText.append(input.getText());
+            UIController.changeInfo(currentText.toString());
             tempStage.hide();
         });
 
@@ -345,6 +324,8 @@ public class DesktopUI extends Application {
         tempStage.setScene(new Scene(root));
 
         tempStage.show();
-
     }
+
+    private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
+
 }
