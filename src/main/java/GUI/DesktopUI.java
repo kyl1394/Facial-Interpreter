@@ -151,15 +151,27 @@ public class DesktopUI extends Application {
         findFacesBtn.setOnAction((ActionEvent event) -> {
             infoLabel.setText("Looking for Faces");
 
+            int currentImageSize = (int) image.getBoundsInParent().getWidth();
+            int normalImageSize = (int) image.getImage().getWidth();
+
+            double imgScale = (double)currentImageSize / (double) normalImageSize;
+
+
             JsonArray jsonArray = UIController.parseImage();
+
+
 
             for (int i = 0; i < jsonArray.size(); i++) {
                 infoLabel.setText("Loading Face Information");
                 JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
 
-                
+                int xPos = (int) (Integer.parseInt(transaction.get("topLeftX").toString()) * imgScale);
+                int yPos = (int) (Integer.parseInt(transaction.get("topLeftX").toString()) * imgScale);
+                int width = (int) (Integer.parseInt(transaction.get("topLeftX").toString()) * imgScale);
+                int height = (int) (Integer.parseInt(transaction.get("topLeftX").toString()) * imgScale);
+                StringBuilder faceText = new StringBuilder(transaction.get("subject").toString());
 
-                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), new StringBuilder(transaction.get("subject").toString())));
+                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(xPos, yPos, width, height, faceText));
             }
 
             if(jsonArray.size() == 0) {
