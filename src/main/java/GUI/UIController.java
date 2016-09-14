@@ -57,9 +57,8 @@ public class UIController {
      *
      * @return The image file given by the user.
      */
-    public static ImageWithPath selectImage()
+    public static Image selectImage()
     {
-        ImageWithPath image = new ImageWithPath();
         FileChooser search = new FileChooser();
         search.getExtensionFilters().add(IMAGE_FILE_EXTENSIONS);
 
@@ -92,11 +91,9 @@ public class UIController {
             int periodLoc = name.indexOf('.');
             fileNAME = name.substring(0, periodLoc);
             fileEXT = name.substring(periodLoc);
-            image.image = selectedImg;
-            image.path = imgFile.getAbsolutePath();
         }
 
-        return image;
+        return selectedImg;
     }
 
     /**
@@ -134,19 +131,23 @@ public class UIController {
         if(imgPath == null || imgPath.equals(""))
             return new JsonArray();
 
-        System.out.println(imgPath + fileNAME + fileEXT);
+        System.out.println(imgPath);
         ImageUploader uploader = new ImageUploader();
         String url = "";
         try {
-            url = uploader.upload(imgPath + fileNAME + fileEXT);
+            url = uploader.upload(imgPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
         String response = Kairos.recognize(url, "testGallery", "0.1");
 
-        JsonElement root = new JsonParser().parse(response);
-        JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
-
+        JsonArray jsonArray = new JsonArray();
+        try {
+            JsonElement root = new JsonParser().parse(response);
+            jsonArray = root.getAsJsonObject().get("images").getAsJsonArray();
+        } catch(NullPointerException e) {
+            return jsonArray; // There were no faces found
+        }
         return jsonArray;
     }
 
@@ -189,7 +190,7 @@ public class UIController {
             capturedImg = openImage(new File("camera.jpg"));
             fileNAME = "camera";
             fileEXT = ".jpg";
-            imgPath = System.getProperty("user.dir");
+            imgPath = System.getProperty("user.dir") + "\\camera.jpg";
 
         } catch(Exception e) {
             e.printStackTrace();

@@ -32,7 +32,6 @@ public class DesktopUI extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Facial Interpreter");
-        System.out.println(getClass().getName());
 
         /* ************************************
          * Initialize all elements of the UI
@@ -123,15 +122,14 @@ public class DesktopUI extends Application {
         });
 
         chooseImgBtn.setOnAction((ActionEvent event) -> {
-            ImageWithPath newImg = UIController.selectImage();
+            Image newImg = UIController.selectImage();
 
-            if(newImg.image == null) // The user didn't load a valid picture
+            if(newImg == null) // The user didn't load a valid picture
                 return;
 
-            pathToChosenImage = newImg.path;
             faceBtnContainer.getChildren().clear();
 
-            image.setImage(newImg.image);
+            image.setImage(newImg);
             if(!stage.isMaximized())
                 stage.sizeToScene();
         });
@@ -155,26 +153,34 @@ public class DesktopUI extends Application {
 
             JsonArray jsonArray = UIController.parseImage();
 
-            infoLabel.setText("No Faces Found");
             for (int i = 0; i < jsonArray.size(); i++) {
-                infoLabel.setText("");
+                infoLabel.setText("Loading Face Information");
                 JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
+
+                
+
                 faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), new StringBuilder(transaction.get("subject").toString())));
             }
 
+            if(jsonArray.size() == 0) {
+                infoLabel.setText("No Faces Found");
+            } else {
+                infoLabel.setText("");
+            }
+
             //if(!stage.isMaximized())
-                stage.sizeToScene();
+                //stage.sizeToScene();
 
         });
 
         //MenuItem Events
         openMenuItem.setOnAction((ActionEvent event) -> {
-            ImageWithPath newImg = UIController.selectImage();
+            Image newImg = UIController.selectImage();
 
             if(newImg == null) // The user didn't want to load a valid picture
                 return;
 
-            image.setImage(newImg.image);
+            image.setImage(newImg);
             //if(!stage.isMaximized())
                 stage.sizeToScene();
         });
@@ -254,7 +260,7 @@ public class DesktopUI extends Application {
 
         //Show the UI
         stage.setScene(new Scene(main));
-        //stage.setResizable(false);
+        stage.setResizable(false);
         stage.show();
     }
 
