@@ -2,8 +2,6 @@ package GUI;
 /**
  * Created by Wes on 9/6/2016.
  */
-import API.ImageUploader;
-import API.Kairos;
 import FireBaseCalls.FirebaseSDK;
 import FireBaseCalls.Student;
 import com.google.gson.JsonArray;
@@ -26,8 +24,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class DesktopUI extends Application {
     public static void main(String[] args) {
@@ -200,6 +196,7 @@ public class DesktopUI extends Application {
                     faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton((int) (Integer.parseInt(x) * imgScaleX), (int) (Integer.parseInt(y) * imgScaleY), (int) (Integer.parseInt(width) * imgScaleX), (int) (Integer.parseInt(height) * imgScaleY), subject));
                 } else {
                     //enroll
+                    DesktopUI.createInfoPopup(new StringBuilder(), new StringBuilder(), new StringBuilder(), false);
                 }
             }
 
@@ -316,8 +313,14 @@ public class DesktopUI extends Application {
         ContextMenu rightClickMenu = new ContextMenu();
         MenuItem editInfo = new MenuItem("Edit Face's Information");
 
+        Student student = FirebaseSDK.findStudentInfo(text);
+        StringBuilder pictureName = new StringBuilder(text);
+        StringBuilder lastSeen = new StringBuilder(student.lastSeen);
+        StringBuilder notes = new StringBuilder(student.notes);
+
+
         editInfo.setOnAction((ActionEvent event) -> {
-            addInfoScene(new StringBuilder(text));
+            createInfoPopup(pictureName, lastSeen, notes, true);
         });
 
         rightClickMenu.getItems().add(editInfo);
@@ -328,11 +331,10 @@ public class DesktopUI extends Application {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
 
             a.setTitle("Face Information");
-            a.setHeaderText(text);
+            a.setHeaderText(pictureName.toString());
 
-            Student student = FirebaseSDK.findStudentInfo(text);
             if (student != null)
-                a.setContentText("Last Seen: " + student.lastSeen + "\n\nNotes: " + student.notes);
+                a.setContentText("Last Seen: " + lastSeen.toString() + "\n\nNotes: " + notes.toString());
 
             a.show();
         });
@@ -340,21 +342,51 @@ public class DesktopUI extends Application {
         return test;
     }
 
-    private static void addInfoScene(StringBuilder currentText) {
+    private static void createInfoPopup(StringBuilder name, StringBuilder lastSeen, StringBuilder metaData, boolean editInfo) {
         Stage tempStage = new Stage();
 
         AnchorPane root = new AnchorPane();
             VBox container = new VBox();
-                TextArea input = new TextArea(currentText.toString());
+                HBox nameContainer = new HBox();
+                    Label nameLabel = new Label("Name");
+                    TextField nameField = new TextField(name.toString());
+                HBox dateSeenContainer = new HBox();
+                    Label dateLabel = new Label("Date Seen");
+                    TextField dateField = new TextField(lastSeen.toString());
+                HBox metaContainer = new HBox();
+                    Label metaLabel = new Label("Notes");
+                    TextArea metaField = new TextArea(metaData.toString());
                 HBox btnContainer = new HBox();
                     Button confirmBtn = new Button("Confirm");
                     Button cancelBtn = new Button("Cancel");
 
+        VBox.setVgrow(nameContainer, Priority.ALWAYS);
+        VBox.setMargin(nameContainer, new Insets(5, 5, 5, 5));
+        VBox.setVgrow(dateSeenContainer, Priority.ALWAYS);
+        VBox.setMargin(dateSeenContainer, new Insets(5, 5, 5, 5));
+        VBox.setVgrow(metaContainer, Priority.ALWAYS);
+        VBox.setMargin(metaContainer, new Insets(5, 5, 5, 5));
+
+        nameContainer.setSpacing(25);
+        dateSeenContainer.setSpacing(2);
+        metaContainer.setSpacing(5);
+        btnContainer.setSpacing(25);
 
         confirmBtn.setOnAction((ActionEvent event) -> {
-            currentText.setLength(0);
-            currentText.append(input.getText());
-            UIController.changeInfo(currentText.toString());
+            name.setLength(0);
+            name.append(nameField.getText());
+
+            lastSeen.setLength(0);
+            lastSeen.append(dateField.getText());
+
+            metaData.setLength(0);
+            metaData.append(metaField.getText());
+
+
+            if(editInfo)
+                UIController.changeInfo(name.toString(), lastSeen.toString(), metaData.toString());
+            else
+                UIController.createNewInfo(name.toString(), lastSeen.toString(), metaData.toString());
             tempStage.hide();
         });
 
@@ -362,13 +394,24 @@ public class DesktopUI extends Application {
             tempStage.hide();
         });
 
-
         btnContainer.getChildren().addAll(confirmBtn, cancelBtn);
-        container.getChildren().addAll(input, btnContainer);
+        metaContainer.getChildren().addAll(metaLabel, metaField);
+        dateSeenContainer.getChildren().addAll(dateLabel, dateField);
+        nameContainer.getChildren().addAll(nameLabel, nameField);
+        container.getChildren().addAll(nameContainer, dateSeenContainer, metaContainer, btnContainer);
         root.getChildren().add(container);
 
-        tempStage.setScene(new Scene(root));
+        if(editInfo)
+        {
+            tempStage.setTitle("Edit Face Information");
+        }
+        else
+        {
+            tempStage.setTitle("Create new Face");
+        }
 
+        tempStage.setScene(new Scene(root));
+        tempStage.setResizable(false);
         tempStage.show();
     }
 

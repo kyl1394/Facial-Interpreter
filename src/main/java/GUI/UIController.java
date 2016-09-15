@@ -203,6 +203,9 @@ public class UIController {
         //return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
     }
 
-    public static void changeInfo(String text) {
+    public static void changeInfo(String name, String lastSeen, String notes) {
+    }
+
+    public static void createNewInfo(String name, String lastSeen, String notes) {
     }
 }
