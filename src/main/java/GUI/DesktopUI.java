@@ -172,19 +172,37 @@ public class DesktopUI extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String response = Kairos.recognize(url, "testGallery", "0.1");
+
+            String response = Kairos.recognize(url, "testGallery", "0.6");
 
             JsonElement root = new JsonParser().parse(response);
             JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
 
             for (int i = 0; i < jsonArray.size(); i++) {
                 JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
-                faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), Integer.parseInt(transaction.get("topLeftX").toString()), transaction.get("subject").toString()));
+                JsonElement subjectJson = transaction.get("subject");
+                JsonElement widthJson = transaction.get("width");
+                JsonElement heightJson = transaction.get("height");
+                JsonElement xJson = transaction.get("topLeftX");
+                JsonElement yJson = transaction.get("topLeftY");
+
+                String x, y, width, height, subject;
+
+                x = xJson == null ? null : xJson.toString();
+                y = yJson == null ? null : yJson.toString();
+                width = widthJson == null ? null : widthJson.toString();
+                height = heightJson == null ? null : heightJson.toString();
+                subject = subjectJson == null ? null : subjectJson.toString();
+
+                System.out.println("Found: " + subject);
+                System.out.println("X: " + x);
+                System.out.println("Y: " + y);
+                if (subject != null) {
+                    faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(width), Integer.parseInt(height), subject));
+                } else {
+                    //enroll
+                }
             }
-
-            //if(!stage.isMaximized())
-                stage.sizeToScene();
-
         });
 
         //MenuItem Events
