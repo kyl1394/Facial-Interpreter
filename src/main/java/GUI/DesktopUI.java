@@ -3,20 +3,17 @@ package GUI;
  * Created by Wes on 9/6/2016.
  */
 import API.ImageUploader;
+import API.Kairos;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -26,11 +23,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.transform.Scale;
-import javafx.stage.Popup;
-import javafx.stage.PopupBuilder;
 import javafx.stage.Stage;
-import API.Kairos;
 
 import java.io.IOException;
 
@@ -61,7 +54,7 @@ public class DesktopUI extends Application {
                     MenuItem zoomOutMenuItem = new MenuItem("Zoom Out");
                 Menu settingsMenu = new Menu("Settings");
                     CheckMenuItem darkModeMenuItem = new CheckMenuItem("Dark Mode");
-                    boolean isDarkMode = false;
+                    boolean isDarkMode = true;
             HBox container = new HBox();
                 StackPane infoStack = new StackPane();
                     //ScrollPane imgContainer = new ScrollPane();
@@ -87,7 +80,6 @@ public class DesktopUI extends Application {
          * Add Properties to the UI
          * ************************************/
 
-        darkModeMenuItem.setDisable(true);
         zoomInMenuItem.setDisable(true);
         zoomOutMenuItem.setDisable(true);
         saveMenuItem.setDisable(true);
@@ -120,8 +112,8 @@ public class DesktopUI extends Application {
         HBox.setHgrow(btnContainer, Priority.ALWAYS);
 
         if(isDarkMode) {
-            //main.getStylesheets().add(DARK_THEME_CSS);
-            //darkModeMenuItem.setSelected(true);
+            main.getStylesheets().add(DARK_THEME_CSS);
+            darkModeMenuItem.setSelected(true);
         }
 
         /* ************************************
@@ -135,15 +127,14 @@ public class DesktopUI extends Application {
         });
 
         chooseImgBtn.setOnAction((ActionEvent event) -> {
-            ImageWithPath newImg = UIController.selectImage();
+            Image newImg = UIController.selectImage();
 
-            if(newImg.image == null) // The user didn't load a valid picture
+            if(newImg == null) // The user didn't load a valid picture
                 return;
 
-            pathToChosenImage = newImg.path;
             faceBtnContainer.getChildren().clear();
 
-            image.setImage(newImg.image);
+            image.setImage(newImg);
             if(!stage.isMaximized())
                 stage.sizeToScene();
         });
@@ -163,22 +154,22 @@ public class DesktopUI extends Application {
         });
 
         findFacesBtn.setOnAction((ActionEvent event) -> {
-            image.setImage(UIController.parseImage(image.getImage()));
-            System.out.println(pathToChosenImage);
-            ImageUploader uploader = new ImageUploader();
-            String url = "";
-            try {
-                url = uploader.upload(pathToChosenImage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            image.setImage(image.getImage());
 
-            String response = Kairos.recognize(url, "testGallery", "0.6");
+            infoLabel.setText("Looking for Faces");
 
-            JsonElement root = new JsonParser().parse(response);
-            JsonArray jsonArray =  root.getAsJsonObject().get("images").getAsJsonArray();
+            int currentImageSize = (int) image.getBoundsInParent().getWidth();
+            int normalImageSize = (int) image.getImage().getWidth();
+
+            double imgScale = (double)currentImageSize / (double) normalImageSize;
+
+
+            JsonArray jsonArray = UIController.parseImage();
+
+
 
             for (int i = 0; i < jsonArray.size(); i++) {
+                infoLabel.setText("Loading Face Information");
                 JsonObject transaction = jsonArray.get(i).getAsJsonObject().get("transaction").getAsJsonObject();
                 JsonElement subjectJson = transaction.get("subject");
                 JsonElement widthJson = transaction.get("width");
@@ -186,6 +177,8 @@ public class DesktopUI extends Application {
                 JsonElement xJson = transaction.get("topLeftX");
                 JsonElement yJson = transaction.get("topLeftY");
 
+            //if(!stage.isMaximized())
+                //stage.sizeToScene();
                 String x, y, width, height, subject;
 
                 x = xJson == null ? null : xJson.toString();
@@ -203,16 +196,22 @@ public class DesktopUI extends Application {
                     //enroll
                 }
             }
+
+            if(jsonArray.size() == 0) {
+                infoLabel.setText("No Faces Found");
+            } else {
+                infoLabel.setText("");
+            }
         });
 
         //MenuItem Events
         openMenuItem.setOnAction((ActionEvent event) -> {
-            ImageWithPath newImg = UIController.selectImage();
+            Image newImg = UIController.selectImage();
 
             if(newImg == null) // The user didn't want to load a valid picture
                 return;
 
-            image.setImage(newImg.image);
+            image.setImage(newImg);
             //if(!stage.isMaximized())
                 stage.sizeToScene();
         });
@@ -292,7 +291,7 @@ public class DesktopUI extends Application {
 
         //Show the UI
         stage.setScene(new Scene(main));
-        //stage.setResizable(false);
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -313,7 +312,7 @@ public class DesktopUI extends Application {
         MenuItem editInfo = new MenuItem("Edit Face's Information");
 
         editInfo.setOnAction((ActionEvent event) -> {
-            addInfoScene(text);
+            addInfoScene(new StringBuilder(text));
         });
 
         rightClickMenu.getItems().add(editInfo);
@@ -324,7 +323,7 @@ public class DesktopUI extends Application {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
 
             a.setTitle("Face Information");
-            a.setHeaderText(text);
+            a.setHeaderText(text.toString());
 
             a.showAndWait();
         });
@@ -332,22 +331,21 @@ public class DesktopUI extends Application {
         return test;
     }
 
-    private final static String DARK_THEME_CSS = "file:///" + System.getProperty("user.dir") + "/src/main/java/GUI/darkTheme.css";
-
-
-    private static void addInfoScene(String currentText) {
+    private static void addInfoScene(StringBuilder currentText) {
         Stage tempStage = new Stage();
 
         AnchorPane root = new AnchorPane();
             VBox container = new VBox();
-                TextArea input = new TextArea(currentText);
+                TextArea input = new TextArea(currentText.toString());
                 HBox btnContainer = new HBox();
                     Button confirmBtn = new Button("Confirm");
                     Button cancelBtn = new Button("Cancel");
 
 
         confirmBtn.setOnAction((ActionEvent event) -> {
-            UIController.changeInfo(input.getText());
+            currentText.setLength(0);
+            currentText.append(input.getText());
+            UIController.changeInfo(currentText.toString());
             tempStage.hide();
         });
 
@@ -363,6 +361,8 @@ public class DesktopUI extends Application {
         tempStage.setScene(new Scene(root));
 
         tempStage.show();
-
     }
+
+    private final static String DARK_THEME_CSS = "/GUI/darkTheme.css";
+
 }

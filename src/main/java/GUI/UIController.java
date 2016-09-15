@@ -1,11 +1,16 @@
 package GUI;
 
-import javafx.embed.swing.SwingFXUtils;
+import API.ImageUploader;
+import API.Kairos;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
-import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -30,6 +35,11 @@ public class UIController {
      */
     private static String fileNAME;
 
+    /**
+     * String to hold the path of the image
+     */
+    private static String imgPath;
+
     //private static final String TAKEN_PIC_SAVE_LOCATION = "";
 
     /**
@@ -47,9 +57,8 @@ public class UIController {
      *
      * @return The image file given by the user.
      */
-    public static ImageWithPath selectImage()
+    public static Image selectImage()
     {
-        ImageWithPath image = new ImageWithPath();
         FileChooser search = new FileChooser();
         search.getExtensionFilters().add(IMAGE_FILE_EXTENSIONS);
 
@@ -76,15 +85,15 @@ public class UIController {
         }
 
         if(selectedImg != null) {
+            imgPath = imgFile.getPath();
+
             String name = imgFile.getName();
             int periodLoc = name.indexOf('.');
             fileNAME = name.substring(0, periodLoc);
             fileEXT = name.substring(periodLoc);
-            image.image = selectedImg;
-            image.path = imgFile.getAbsolutePath();
         }
 
-        return image;
+        return selectedImg;
     }
 
     /**
@@ -115,13 +124,31 @@ public class UIController {
      *
      * Specifically, this method will determine the faces in an image and add metadata about the image to make a new image.
      *
-     * @param imgToParse The image to parse
      * @return An image containing the metadata of all recognized faces
      */
-    public static Image parseImage(Image imgToParse) {
+    public static JsonArray parseImage() {
 
-        //TODO implement facial recognition code
-        return imgToParse;
+        if(imgPath == null || imgPath.equals(""))
+            return new JsonArray();
+
+        System.out.println(imgPath);
+        ImageUploader uploader = new ImageUploader();
+        String url = "";
+        try {
+            url = uploader.upload(imgPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String response = Kairos.recognize(url, "testGallery", "0.1");
+
+        JsonArray jsonArray = new JsonArray();
+        try {
+            JsonElement root = new JsonParser().parse(response);
+            jsonArray = root.getAsJsonObject().get("images").getAsJsonArray();
+        } catch(NullPointerException e) {
+            return jsonArray; // There were no faces found
+        }
+        return jsonArray;
     }
 
     /**
@@ -160,8 +187,11 @@ public class UIController {
         //Load the Picture
         Image capturedImg = null;
         try {
-            File temp = new File("camera.jpg");
-            capturedImg = openImage(temp);
+            capturedImg = openImage(new File("camera.jpg"));
+            fileNAME = "camera";
+            fileEXT = ".jpg";
+            imgPath = System.getProperty("user.dir") + "\\camera.jpg";
+
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -169,7 +199,8 @@ public class UIController {
     }
 
     private static Image openImage(File imgToOpen) throws Exception{
-        return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
+        return new Image(new FileInputStream(imgToOpen));
+        //return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
     }
 
     public static void changeInfo(String text) {
