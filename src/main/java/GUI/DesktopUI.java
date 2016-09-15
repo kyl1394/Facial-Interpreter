@@ -158,10 +158,14 @@ public class DesktopUI extends Application {
 
             infoLabel.setText("Looking for Faces");
 
-            int currentImageSize = (int) image.getBoundsInParent().getWidth();
-            int normalImageSize = (int) image.getImage().getWidth();
+            int currentImageSizeX = (int) image.getBoundsInParent().getWidth();
+            int normalImageSizeX = (int) image.getImage().getWidth();
 
-            double imgScale = (double)currentImageSize / (double) normalImageSize;
+            int currentImageSizeY = (int) image.getBoundsInParent().getHeight();
+            int normalImageSizeY = (int) image.getImage().getHeight();
+
+            double imgScaleX = (double)currentImageSizeX / (double) normalImageSizeX;
+            double imgScaleY = (double)currentImageSizeY / (double) normalImageSizeY;
 
 
             JsonArray jsonArray = UIController.parseImage();
@@ -191,7 +195,7 @@ public class DesktopUI extends Application {
                 System.out.println("X: " + x);
                 System.out.println("Y: " + y);
                 if (subject != null) {
-                    faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(width), Integer.parseInt(height), subject));
+                    faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton((int) (Integer.parseInt(x) * imgScaleX), (int) (Integer.parseInt(y) * imgScaleY), (int) (Integer.parseInt(width) * imgScaleX), (int) (Integer.parseInt(height) * imgScaleY), subject));
                 } else {
                     //enroll
                 }
