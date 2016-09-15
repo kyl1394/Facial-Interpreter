@@ -1,8 +1,19 @@
+package API;
+
+import GUI.DesktopUI;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * Created by krohlfing
@@ -52,7 +63,7 @@ public class Kairos {
         recognize(imageUrl, galleryName, "0.2");
     }
 
-    public static void recognize(String imageUrl, String galleryName, String threshold) {
+    public static String recognize(String imageUrl, String galleryName, String threshold) {
         Client client = ClientBuilder.newClient();
         Entity<String>  payload = Entity.text("{\n" +
                 "    \"image\":\" " + imageUrl + " \",\n" +
@@ -65,9 +76,12 @@ public class Kairos {
                 .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
                 .post(payload);
 
-        System.out.println("status: " + response.getStatus());
-        System.out.println("headers: " + response.getHeaders());
-        System.out.println("body:" + response.readEntity(String.class));
+        String body = response.readEntity(String.class);
+
+        return body;
+//        System.out.println("status: " + response.getStatus());
+//        System.out.println("headers: " + response.getHeaders());
+//        System.out.println("body:" + body);
     }
 
     public static void listGallery() {
