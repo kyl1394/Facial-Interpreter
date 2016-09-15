@@ -4,8 +4,10 @@ package FireBaseCalls;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.*;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.Scanner;
 
 /**
@@ -14,9 +16,8 @@ import java.util.Scanner;
 public class FirebaseSDK {
 
 
-    public FirebaseSDK() throws FileNotFoundException {
-
-        //the folowing string contains our authebntication information for the firebase server.
+    public static void initFirebaseSDK(){
+        //the following string contains our authentication information for the firebase server.
         // we were having issues reading in the .json file using a relative path so we got this.
         String a = "{\n" +
                 "  \"type\": \"service_account\",\n" +
@@ -38,5 +39,46 @@ public class FirebaseSDK {
         FirebaseApp.initializeApp(options);
     }
 
+    private static int studentFound = 0;
+    private static Student queriedStudent;
 
+    // This functino will look through the database for the student name
+    public static Student findStudentInfo(String name){
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("server/test/student");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Iterator iter = snapshot.getChildren().iterator();
+                while (iter.hasNext()) {
+                    DataSnapshot snap = (DataSnapshot) iter.next();
+                    if (snap.child("name").getValue().equals(name)) {
+                        queriedStudent = new Student(snap.child("name").getValue().toString(), snap.child("notes").getValue().toString(), snap.child("lastSeen").getValue().toString());
+                        studentFound = 1;
+                        return;
+                    }
+                }
+
+                studentFound = -1;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+                studentFound  = -1;
+                queriedStudent = null;
+                return;
+            }
+        });
+
+        while (studentFound == 0) {
+            // You must give this loop something to do otherwise running it out of debug mode will just cause it to hang
+            // for some unknown reason...
+            System.out.println("loading...");
+        }
+
+        studentFound = 0;
+        return queriedStudent;
+    }
 }

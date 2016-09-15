@@ -4,6 +4,8 @@ package GUI;
  */
 import API.ImageUploader;
 import API.Kairos;
+import FireBaseCalls.FirebaseSDK;
+import FireBaseCalls.Student;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -71,7 +73,6 @@ public class DesktopUI extends Application {
                         Button findFacesBtn = new Button("Find Faces");
 
         infoStack.setAlignment(Pos.TOP_LEFT);
-        Button test = createNewFaceButton(50, 50, 100, 100, "");
 
 
 
@@ -195,6 +196,7 @@ public class DesktopUI extends Application {
                 System.out.println("X: " + x);
                 System.out.println("Y: " + y);
                 if (subject != null) {
+                    subject = subject.substring(1, subject.length() - 1);
                     faceBtnContainer.getChildren().add(DesktopUI.createNewFaceButton((int) (Integer.parseInt(x) * imgScaleX), (int) (Integer.parseInt(y) * imgScaleY), (int) (Integer.parseInt(width) * imgScaleX), (int) (Integer.parseInt(height) * imgScaleY), subject));
                 } else {
                     //enroll
@@ -283,7 +285,6 @@ public class DesktopUI extends Application {
         //zoomGroup.getChildren().add(image);
         //imgContainer.setContent(zoomGroup);
 
-        faceBtnContainer.getChildren().add(test);
         infoStack.getChildren().addAll(image, faceBtnContainer);
 
 
@@ -327,9 +328,13 @@ public class DesktopUI extends Application {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
 
             a.setTitle("Face Information");
-            a.setHeaderText(text.toString());
+            a.setHeaderText(text);
 
-            a.showAndWait();
+            Student student = FirebaseSDK.findStudentInfo(text);
+            if (student != null)
+                a.setContentText("Last Seen: " + student.lastSeen + "\n\nNotes: " + student.notes);
+
+            a.show();
         });
 
         return test;
