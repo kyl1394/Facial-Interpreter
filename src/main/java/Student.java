@@ -12,4 +12,11 @@ public class Student {
         this.LastSeen = LastSeen;
     }
 
+    public String toString(){
+        String output = new String();
+
+        output += "{Name=" + Name + ", Notes=" + ", LastSeen="+ LastSeen + "}";
+
+        return output;
+    }
 }

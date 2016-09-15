@@ -90,7 +90,7 @@ public class Main {
 
         //studentRef.push().setValue(tmp);  // this will add a student to the db if passed the object.
 
-        System.out.println("data set to DB");
+        //System.out.println("data set to DB");
         System.out.println(FindStudentInfo("Kelly"));
         System.out.println("ran find student info");
 
@@ -100,6 +100,7 @@ public class Main {
     private static Student FindStudentInfo(String Name){
         final Student[] foundStudent = {null};
         final String[] prmaryKey = {null};
+        final boolean[] DbSearched = {false};
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("server/test/student");
 
@@ -107,11 +108,12 @@ public class Main {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey){
                 prmaryKey[0] = dataSnapshot.getKey();
-                System.out.println( dataSnapshot.getValue());
+                //System.out.println( dataSnapshot.getValue());
                 Object tmp = dataSnapshot.getValue();
-                System.out.println(((HashMap<String,String>)tmp).get("Name"));
-                //foundStudent[0] = new Student(((HashMap<String,String>)tmp).get("Name"),)
-
+                HashMap<String,String> tmp1 =((HashMap<String,String>)tmp);
+                //System.out.println(tmp1.get("Name"));
+                foundStudent[0] = new Student(tmp1.get("Name"),tmp1.get("Notes"),tmp1.get("LastSeen"));
+                DbSearched[0] = true;
             }
 
             @Override
@@ -124,7 +126,8 @@ public class Main {
             public void onCancelled(DatabaseError databaseError) {}
         });
 
-
+        while(DbSearched[0] == false);  // force function call to wait for the database search
+        //System.out.println(foundStudent[0]);
         return foundStudent[0];
     }
 }
