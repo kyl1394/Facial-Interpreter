@@ -60,7 +60,7 @@ public class Kairos {
     }
 
     public static void recognize(String imageUrl, String galleryName) {
-        recognize(imageUrl, galleryName, "0.2");
+        recognize(imageUrl, galleryName, "0.7");
     }
 
     public static String recognize(String imageUrl, String galleryName, String threshold) {

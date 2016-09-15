@@ -2,6 +2,9 @@ package GUI;
 
 import API.ImageUploader;
 import API.Kairos;
+import FireBaseCalls.Student;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -126,6 +129,7 @@ public class UIController {
      *
      * @return An image containing the metadata of all recognized faces
      */
+    private static String url = "";
     public static JsonArray parseImage() {
 
         if(imgPath == null || imgPath.equals(""))
@@ -133,13 +137,13 @@ public class UIController {
 
         System.out.println(imgPath);
         ImageUploader uploader = new ImageUploader();
-        String url = "";
+        url = "";
         try {
             url = uploader.upload(imgPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String response = Kairos.recognize(url, "testGallery", "0.1");
+        String response = Kairos.recognize(url, "testGallery", "0.6");
 
         JsonArray jsonArray = new JsonArray();
         try {
@@ -207,5 +211,11 @@ public class UIController {
     }
 
     public static void createNewInfo(String name, String lastSeen, String notes) {
+        name = name.replaceAll("\\s","");
+        Student student = new Student(name, notes, lastSeen);
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("server/test/student");
+        ref.push().setValue(student);
+        Kairos.enroll(url, name.trim(), "testGallery");
     }
 }

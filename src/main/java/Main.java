@@ -2,6 +2,7 @@
  * Created by krohlfing on 8/30/2016.
  */
 
+import API.Kairos;
 import FireBaseCalls.FirebaseSDK;
 import FireBaseCalls.Student;
 import GUI.DesktopUI;
