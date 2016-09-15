@@ -16,32 +16,13 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.IOException;
 
 public class Main {
     public static void main(String args[]) throws FileNotFoundException{
         initFirebaseSDK();
 
         DesktopUI.main(args);
-    }
-
-    public static void enroll() {
-        Client client = ClientBuilder.newClient();
-        Entity<String> payload = Entity.text("{\n" +
-                "    \"image\":\" http://media.kairos.com/kairos-elizabeth.jpg \",\n" +
-                "    \"subject_id\":\"subtest1\",\n" +
-                "    \"gallery_name\":\"gallerytest1\",\n" +
-                "    \"selector\":\"SETPOSE\",\n" +
-                "    \"symmetricFill\":\"true\"\n" +
-                "}");
-        Response response = client.target("https://api.kairos.com/enroll")
-                .request(MediaType.TEXT_PLAIN_TYPE)
-                .header("app_id", "b9ed4d88")
-                .header("app_key", "70cb2baf9f2af37e3b7cb90e4dfb88db")
-                .post(payload);
-
-        System.out.println("status: " + response.getStatus());
-        System.out.println("headers: " + response.getHeaders());
-        System.out.println("body:" + response.readEntity(String.class));
     }
 
     public static void initFirebaseSDK(){
@@ -90,7 +71,7 @@ public class Main {
 
         //studentRef.push().setValue(tmp);  // this will add a student to the db if passed the object.
 
-        //System.out.println("data set to DB");
+        System.out.println("data set to DB");
         System.out.println(FindStudentInfo("Kelly"));
         System.out.println("ran find student info");
 

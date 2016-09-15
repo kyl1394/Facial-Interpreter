@@ -1,12 +1,21 @@
 package GUI;
 
-import javafx.embed.swing.SwingFXUtils;
+import API.ImageUploader;
+import API.Kairos;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
-
-import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
+import org.opencv.highgui.VideoCapture;
 
 /**
  * This static class is used for the logic of the UI.
@@ -25,6 +34,13 @@ public class UIController {
      * String to hold the current image's file name
      */
     private static String fileNAME;
+
+    /**
+     * String to hold the path of the image
+     */
+    private static String imgPath;
+
+    //private static final String TAKEN_PIC_SAVE_LOCATION = "";
 
     /**
      * Object to select all valid image files when opening/saving
@@ -55,7 +71,7 @@ public class UIController {
             if(imgFile == null)
                 throw new NullPointerException();
 
-            selectedImg = SwingFXUtils.toFXImage(ImageIO.read(imgFile), null);
+            selectedImg = openImage(imgFile);
         } catch (NullPointerException e) {
             //Do nothing. User just cancelled the operation
         } catch(Exception e) {
@@ -69,11 +85,14 @@ public class UIController {
         }
 
         if(selectedImg != null) {
+            imgPath = imgFile.getPath();
+
             String name = imgFile.getName();
             int periodLoc = name.indexOf('.');
             fileNAME = name.substring(0, periodLoc);
             fileEXT = name.substring(periodLoc);
         }
+
         return selectedImg;
     }
 
@@ -83,7 +102,6 @@ public class UIController {
      * @param file The image to save
      */
     public static void saveImage(Image file) {
-        //TODO
         FileChooser save = new FileChooser();
         if(fileEXT == null || fileEXT.equals("") || fileNAME == null || fileNAME.equals("")) {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
@@ -106,12 +124,85 @@ public class UIController {
      *
      * Specifically, this method will determine the faces in an image and add metadata about the image to make a new image.
      *
-     * @param imgToParse The image to parse
      * @return An image containing the metadata of all recognized faces
      */
-    public static Image parseImage(Image imgToParse) {
+    public static JsonArray parseImage() {
 
-        //TODO implement facial recognition code
-        return imgToParse;
+        if(imgPath == null || imgPath.equals(""))
+            return new JsonArray();
+
+        System.out.println(imgPath);
+        ImageUploader uploader = new ImageUploader();
+        String url = "";
+        try {
+            url = uploader.upload(imgPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String response = Kairos.recognize(url, "testGallery", "0.1");
+
+        JsonArray jsonArray = new JsonArray();
+        try {
+            JsonElement root = new JsonParser().parse(response);
+            jsonArray = root.getAsJsonObject().get("images").getAsJsonArray();
+        } catch(NullPointerException e) {
+            return jsonArray; // There were no faces found
+        }
+        return jsonArray;
+    }
+
+    /**
+     * Takes a picture using the given camera, if available.
+     *
+     * @return The picture taken by the camera
+     */
+    public static Image takePicture() {
+        //Take the picture and save it
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        VideoCapture camera = new VideoCapture(0);
+
+        if (!camera.isOpened()) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+
+            a.setTitle("Error in Taking a Picture");
+            a.setHeaderText("Cannot Open the Camera");
+            a.setContentText("This application cannot open your camera. Either you don't have one, or it doesn't have permission to open it.");
+
+            a.showAndWait();
+        } else {
+            Mat frame = new Mat();
+            while (true) {
+                if (camera.read(frame)) {
+                    System.out.println("Frame Obtained");
+                    System.out.println("Captured Frame Width " +
+                            frame.width() + " Height " + frame.height());
+                    Highgui.imwrite("camera.jpg", frame);
+                    System.out.println("OK");
+                    break;
+                }
+            }
+        }
+        camera.release();
+
+        //Load the Picture
+        Image capturedImg = null;
+        try {
+            capturedImg = openImage(new File("camera.jpg"));
+            fileNAME = "camera";
+            fileEXT = ".jpg";
+            imgPath = System.getProperty("user.dir") + "\\camera.jpg";
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return capturedImg;
+    }
+
+    private static Image openImage(File imgToOpen) throws Exception{
+        return new Image(new FileInputStream(imgToOpen));
+        //return SwingFXUtils.toFXImage(ImageIO.read(imgToOpen), null);
+    }
+
+    public static void changeInfo(String text) {
     }
 }
